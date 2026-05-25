@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polla Mundial 2026 — Mis Predicciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #F5A623;
+  --gold-light: #FFD166;
+  --red: #D62828;
+  --green: #06A77D;
+  --blue-dark: #0A0E1A;
+  --blue-mid: #0D1526;
+  --blue-panel: #111B30;
+  --blue-card: #162036;
+  --border: rgba(245,166,35,0.18);
+  --text: #E8EEF7;
+  --muted: #7A8BAA;
+  --success: #06A77D;
+  --accent: #3B82F6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--blue-dark);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(245,166,35,0.08) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.015) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 40px);
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #0A0E1A 0%, #0D1B3E 100%);
+  border-bottom: 2px solid var(--gold);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 30px rgba(245,166,35,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-trophy { font-size: 1.8rem; }
+.logo-text h1 { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; letter-spacing: 3px; color: var(--gold); line-height: 1; }
+.logo-text span { font-family: 'Barlow Condensed', sans-serif; font-size: 0.68rem; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+.header-player { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; color: var(--muted); letter-spacing: 1px; }
+.header-player strong { color: var(--gold); font-size: 1rem; }
+
+/* ── MAIN ── */
+main { max-width: 640px; margin: 0 auto; padding: 28px 16px 80px; }
+
+/* ── WELCOME SCREEN ── */
+.welcome-card {
+  background: var(--blue-panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.welcome-hero {
+  background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.03));
+  border-bottom: 1px solid var(--border);
+  padding: 36px 28px;
+  text-align: center;
+}
+.welcome-hero .trophy { font-size: 4rem; margin-bottom: 12px; }
+.welcome-hero h2 { font-family: 'Bebas Neue', cursive; font-size: 2rem; letter-spacing: 4px; color: var(--gold); margin-bottom: 6px; }
+.welcome-hero p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+.welcome-body { padding: 24px 28px; }
+.welcome-body label { display: block; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.welcome-input {
+  width: 100%;
+  background: var(--blue-dark);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.2rem;
+  padding: 12px 16px;
+  margin-bottom: 6px;
+  transition: border-color 0.2s;
+  letter-spacing: 1px;
+}
+.welcome-input:focus { outline: none; border-color: var(--gold); }
+.welcome-rules {
+  background: rgba(245,166,35,0.06);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.7;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+.rule-item { display: flex; gap: 6px; align-items: baseline; }
+.rule-pts { font-family: 'Bebas Neue', cursive; font-size: 1rem; color: var(--gold); min-width: 24px; }
+
+/* ── BUTTONS ── */
+.btn {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  width: 100%;
+}
+.btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.btn-success { background: var(--success); }
+.btn-success:hover { background: #08bf8f; }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 20px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; }
+.progress-bar-bg { background: rgba(255,255,255,0.06); border-radius: 10px; height: 6px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 10px; transition: width 0.4s; }
+.step-dots { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.08); transition: all 0.2s; flex-shrink: 0; }
+.dot.done { background: var(--gold); opacity: 0.5; }
+.dot.active { background: var(--gold); width: 20px; border-radius: 4px; }
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--blue-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.step-card-header {
+  background: linear-gradient(90deg, rgba(245,166,35,0.1), transparent);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.step-icon { font-size: 1.6rem; }
+.step-title { font-family: 'Bebas Neue', cursive; font-size: 1.3rem; letter-spacing: 2px; color: var(--gold); line-height: 1; }
+.step-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+.step-body { padding: 18px; }
+
+/* ── MATCH ROW ── */
+.match-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.match-row:last-child { border-bottom: none; }
+.team-name { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600; }
+.team-name.right { text-align: right; }
+.score-group { display: flex; align-items: center; gap: 5px; }
+.score-inp {
+  width: 38px; height: 34px;
+  background: var(--blue-dark);
+  border: 1.5px solid rgba(245,166,35,0.3);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.2rem;
+  text-align: center;
+  -moz-appearance: textfield;
+  transition: border-color 0.2s;
+}
+.score-inp::-webkit-outer-spin-button,
+.score-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+.score-inp:focus { outline: none; border-color: var(--gold); background: rgba(245,166,35,0.06); }
+.score-sep { font-family: 'Bebas Neue', cursive; color: var(--muted); font-size: 1.1rem; }
+
+/* ── STANDINGS TABLE ── */
+.standings-mini { margin-top: 14px; border-top: 1px dashed rgba(255,255,255,0.07); padding-top: 12px; }
+.standings-mini h4 { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.std-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.std-table th { font-size: 0.58rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 2px 4px; text-align: center; }
+.std-table th:nth-child(2) { text-align: left; }
+.std-table td { padding: 3px 4px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.std-table td:nth-child(2) { text-align: left; font-weight: 600; }
+.std-table tr:last-child td { border: none; }
+.pos-1 { color: var(--gold); font-family: 'Bebas Neue', cursive; }
+.pos-2 { color: #A0AEC0; font-family: 'Bebas Neue', cursive; }
+.pos-3 { color: #CD7F32; font-family: 'Bebas Neue', cursive; }
+.std-pts-val { font-family: 'Bebas Neue', cursive; font-size: 0.95rem; color: var(--gold); }
+.badge-classif { font-size: 0.55rem; background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3); border-radius: 3px; padding: 1px 4px; color: var(--gold); margin-left: 4px; }
+.badge-third { font-size: 0.55rem; background: rgba(205,127,50,0.15); border: 1px solid rgba(205,127,50,0.3); border-radius: 3px; padding: 1px 4px; color: #CD7F32; margin-left: 4px; }
+
+/* ── THIRDS DISPLAY ── */
+.thirds-list { display: flex; flex-direction: column; gap: 7px; }
+.third-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--blue-card); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 12px;
+}
+.third-num { font-family: 'Bebas Neue', cursive; font-size: 1.1rem; color: var(--gold); min-width: 18px; }
+.third-info { flex: 1; }
+.third-team { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.95rem; }
+.third-meta { font-size: 0.62rem; color: var(--muted); }
+
+/* ── KO MATCH ── */
+.ko-match {
+  background: var(--blue-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.ko-match-num { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.ko-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ko-select {
+  flex: 1;
+  min-width: 100px;
+  background: var(--blue-dark);
+  border: 1.5px solid rgba(245,166,35,0.25);
+  border-radius: 5px;
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.82rem;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.ko-select:focus { outline: none; border-color: var(--gold); }
+
+/* ── CHAMPION ── */
+.champ-select {
+  width: 100%;
+  background: var(--blue-dark);
+  border: 2px solid rgba(245,166,35,0.35);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  padding: 12px 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.champ-select:focus { outline: none; border-color: var(--gold); }
+
+/* ── NAV BUTTONS ── */
+.nav-btns { display: flex; gap: 10px; margin-top: 18px; }
+.nav-btns .btn { flex: 1; }
+
+/* ── DONE SCREEN ── */
+.summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
+.summary-item { background: var(--blue-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+.summary-val { font-family: 'Bebas Neue', cursive; font-size: 1.6rem; color: var(--gold); }
+.summary-lbl { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+/* ── INFO BOX ── */
+.info-box {
+  background: rgba(245,166,35,0.06);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.info-box strong { color: var(--text); }
+.info-box .gold { color: var(--gold); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--blue-dark); }
+::-webkit-scrollbar-thumb { background: rgba(245,166,35,0.25); border-radius: 3px; }
+
+/* ── PDF PREVIEW ── */
+#pdf-preview-wrap {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  display: none;
+}
+#pdf-preview { font-family: Arial, sans-serif; font-size: 9px; color: #111; padding: 16px; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .summary-grid { grid-template-columns: repeat(2,1fr); }
+  .welcome-rules { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-trophy">🏆</span>
+    <div class="logo-text">
+      <h1>Polla Mundial</h1>
+      <span>FIFA World Cup 2026</span>
+    </div>
+  </div>
+  <div class="header-player" id="header-player"></div>
+</header>
+
+<main id="app"></main>
+
+<script>
+// ================================================================
+// DATA
+// ================================================================
+const GROUPS_DEF = [
+  { id:'A', teams:['México','Jamaica','Honduras','Guatemala'] },
+  { id:'B', teams:['EEUU','Panamá','Trinidad y Tobago','Guyana'] },
+  { id:'C', teams:['Canadá','Costa Rica','Cuba','Surinam'] },
+  { id:'D', teams:['Brasil','Venezuela','Ecuador','Bolivia'] },
+  { id:'E', teams:['Argentina','Uruguay','Paraguay','Chile'] },
+  { id:'F', teams:['Colombia','Perú','El Salvador','Haití'] },
+  { id:'G', teams:['España','Alemania','Bélgica','Eslovaquia'] },
+  { id:'H', teams:['Francia','Países Bajos','Hungría','Georgia'] },
+  { id:'I', teams:['Portugal','Croacia','Dinamarca','República Checa'] },
+  { id:'J', teams:['Inglaterra','Turquía','Eslovenia','Serbia'] },
+  { id:'K', teams:['Marruecos','Sudáfrica','Tanzania','Senegal'] },
+  { id:'L', teams:['Arabia Saudita','Japón','Corea del Sur','Australia'] },
+];
+
+const KO_PHASES = [
+  { id:'r16', label:'Octavos de Final', count:16 },
+  { id:'qf',  label:'Cuartos de Final', count:8 },
+  { id:'sf',  label:'Semifinales', count:4 },
+  { id:'tp',  label:'Tercer y Cuarto Puesto', count:2 },
+  { id:'final',label:'Final', count:2 },
+];
+
+const ALL_TEAMS = GROUPS_DEF.flatMap(g => g.teams);
+
+function buildMatches(teams) {
+  const m = [];
+  for (let i=0;i<teams.length;i++)
+    for (let j=i+1;j<teams.length;j++)
+      m.push({ home: teams[i], away: teams[j] });
+  return m;
+}
+
+// ================================================================
+// STATE — local only for this wizard session
+// ================================================================
+const WZ = {
+  name: '',
+  pid: null,
+  step: 'welcome', // 'welcome' | 'group_N' | 'ko_N' | 'champ' | 'done'
+  groups: {},      // { 'A_0_h': 2, 'A_0_a': 1, ... }
+  ko: {},          // { 'r16_0_h': 1, 'r16_0_a': 0, 'r16_0_ht': 'España', ... }
+  champion: '',
+};
+
+// ================================================================
+// SHARED localStorage with main app
+// ================================================================
+const STORAGE_KEY = 'polla_mundial_2026';
+
+function loadAppState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch(e) { return null; }
+}
+
+function saveToApp() {
+  let appState = loadAppState();
+  if (!appState) {
+    appState = { players:[], data:{}, real:{ groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' } };
+  }
+  // Find or create player
+  let player = appState.players.find(p => p.name.toLowerCase() === WZ.name.toLowerCase());
+  if (!player) {
+    player = { id: 'wz_' + Date.now(), name: WZ.name };
+    appState.players.push(player);
+  }
+  WZ.pid = player.id;
+
+  // Build classif from standings
+  const classif = {};
+  GROUPS_DEF.forEach(g => {
+    const s = calcGroupStandings(g.id);
+    if (s[0].pj > 0) { classif[g.id+'_1'] = s[0].name; classif[g.id+'_2'] = s[1].name; }
+  });
+
+  // Best 8 thirds
+  const thirds = {};
+  calcBest8Thirds().forEach((t,i) => { thirds['t'+i] = t.team; });
+
+  appState.data[player.id] = {
+    groups: { ...WZ.groups },
+    classif,
+    thirds,
+    ko: { ...WZ.ko },
+    champion: WZ.champion,
+  };
+  appState.groupPlayerView = player.id;
+  appState.koPlayerView = player.id;
+
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
+}
+
+// ================================================================
+// STANDINGS + THIRDS CALC
+// ================================================================
+function calcGroupStandings(gid) {
+  const teams = GROUPS_DEF.find(g => g.id === gid).teams;
+  const matches = buildMatches(teams);
+  const table = {};
+  teams.forEach(t => { table[t] = { pts:0, pj:0, pg:0, pe:0, pp:0, gf:0, gc:0, gd:0 }; });
+
+  matches.forEach((m, mi) => {
+    const gh = WZ.groups[`${gid}_${mi}_h`];
+    const ga = WZ.groups[`${gid}_${mi}_a`];
+    if (gh === undefined || gh === '' || gh === null || ga === undefined || ga === '' || ga === null) return;
+    const ghi = parseInt(gh), gai = parseInt(ga);
+    if (isNaN(ghi) || isNaN(gai)) return;
+    table[m.home].pj++; table[m.away].pj++;
+    table[m.home].gf += ghi; table[m.home].gc += gai; table[m.home].gd = table[m.home].gf - table[m.home].gc;
+    table[m.away].gf += gai; table[m.away].gc += ghi; table[m.away].gd = table[m.away].gf - table[m.away].gc;
+    if (ghi > gai) { table[m.home].pts+=3; table[m.home].pg++; table[m.away].pp++; }
+    else if (gai > ghi) { table[m.away].pts+=3; table[m.away].pg++; table[m.home].pp++; }
+    else { table[m.home].pts++; table[m.home].pe++; table[m.away].pts++; table[m.away].pe++; }
+  });
+
+  return Object.entries(table).sort((a,b) =>
+    b[1].pts !== a[1].pts ? b[1].pts - a[1].pts :
+    b[1].gd !== a[1].gd ? b[1].gd - a[1].gd :
+    b[1].gf !== a[1].gf ? b[1].gf - a[1].gf : a[0].localeCompare(b[0])
+  ).map(([name, s]) => ({ name, ...s }));
+}
+
+function calcBest8Thirds() {
+  const thirds = GROUPS_DEF.map(g => {
+    const s = calcGroupStandings(g.id);
+    if (!s[2] || s[2].pj === 0) return null;
+    return { team: s[2].name, pts: s[2].pts, gd: s[2].gd, gf: s[2].gf, group: g.id };
+  }).filter(Boolean);
+  thirds.sort((a,b) => b.pts!==a.pts?b.pts-a.pts : b.gd!==a.gd?b.gd-a.gd : b.gf-a.gf);
+  return thirds.slice(0,8);
+}
+
+// ================================================================
+// STEP MANAGEMENT
+// ================================================================
+// steps: welcome → groups 0..11 → ko 0..4 → champ → done
+let stepIdx = -1; // -1=welcome, 0-11=groups, 12-16=ko, 17=champ, 18=done
+const TOTAL_STEPS = 19; // groups(12) + ko(5) + champ(1)
+
+function currentStepLabel() {
+  if (stepIdx < 0) return 'Bienvenida';
+  if (stepIdx <= 11) return `Grupo ${GROUPS_DEF[stepIdx].id}`;
+  if (stepIdx <= 16) return KO_PHASES[stepIdx-12].label;
+  if (stepIdx === 17) return 'Campeón';
+  return '¡Completado!';
+}
+
+function progressPct() {
+  if (stepIdx < 0) return 0;
+  return Math.round(((stepIdx+1) / TOTAL_STEPS) * 100);
+}
+
+function renderProgress() {
+  if (stepIdx < 0) return '';
+  const pct = progressPct();
+  const dots = Array.from({length: TOTAL_STEPS}, (_,i) => {
+    let cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : '';
+    return `<div class="dot ${cls}"></div>`;
+  }).join('');
+  return `<div class="progress-wrap">
+    <div class="progress-label">
+      <span style="color:var(--gold);font-weight:600;">${currentStepLabel()}</span>
+      <span>${pct}% completado</span>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+    <div class="step-dots">${dots}</div>
+  </div>`;
+}
+
+// ================================================================
+// RENDER ROUTER
+// ================================================================
+function render() {
+  const app = document.getElementById('app');
+  const hp = document.getElementById('header-player');
+  hp.innerHTML = WZ.name ? `Jugador: <strong>${escHtml(WZ.name)}</strong>` : '';
+
+  if (stepIdx === -1) { renderWelcome(app); return; }
+  if (stepIdx <= 11)  { renderGroup(app, stepIdx); return; }
+  if (stepIdx <= 16)  { renderKO(app, stepIdx-12); return; }
+  if (stepIdx === 17) { renderChamp(app); return; }
+  renderDone(app);
+}
+
+// ================================================================
+// WELCOME
+// ================================================================
+function renderWelcome(app) {
+  app.innerHTML = `
+  <div class="welcome-card">
+    <div class="welcome-hero">
+      <div class="trophy">⚽🏆</div>
+      <h2>¡Bienvenido a la Polla!</h2>
+      <p>Introduce tus predicciones para el Mundial 2026.<br>Al final recibirás un PDF con todas tus apuestas.</p>
+    </div>
+    <div class="welcome-body">
+      <label for="player-name-inp">Tu nombre completo</label>
+      <input class="welcome-input" id="player-name-inp" type="text" placeholder="Ej: Carlos García" maxlength="40"
+        onkeydown="if(event.key==='Enter')startWizard()" autofocus>
+      <p id="name-error" style="color:#EF6666;font-size:0.75rem;min-height:16px;margin-bottom:8px;"></p>
+      
+      <div class="welcome-rules">
+        <div class="rule-item"><span class="rule-pts">3</span> Marcador exacto</div>
+        <div class="rule-item"><span class="rule-pts">5</span> Clasificados en orden</div>
+        <div class="rule-item"><span class="rule-pts">2</span> Aciertas el ganador</div>
+        <div class="rule-item"><span class="rule-pts">3</span> Clasificados sin orden</div>
+        <div class="rule-item"><span class="rule-pts">1</span> Aciertas el empate</div>
+        <div class="rule-item"><span class="rule-pts">1</span> Por cada 3° clasificado</div>
+        <div class="rule-item"><span class="rule-pts" style="color:var(--gold-light);">10</span> Campeón del mundo</div>
+      </div>
+      
+      <button class="btn" onclick="startWizard()">🚀 Comenzar mis Predicciones</button>
+    </div>
+  </div>`;
+}
+
+function startWizard() {
+  const inp = document.getElementById('player-name-inp');
+  const name = inp ? inp.value.trim() : WZ.name;
+  if (!name) {
+    const err = document.getElementById('name-error');
+    if (err) err.textContent = 'Por favor escribe tu nombre.';
+    return;
+  }
+  WZ.name = name;
+  stepIdx = 0;
+  render();
+}
+
+// ================================================================
+// GROUP STEP
+// ================================================================
+function renderGroup(app, gi) {
+  const g = GROUPS_DEF[gi];
+  const matches = buildMatches(g.teams);
+  const standings = calcGroupStandings(g.id);
+  const hasScores = standings.some(r => r.pj > 0);
+
+  const matchRows = matches.map((m, mi) => {
+    const kh = `${g.id}_${mi}_h`, ka = `${g.id}_${mi}_a`;
+    const vh = WZ.groups[kh] ?? '';
+    const va = WZ.groups[ka] ?? '';
+    return `<div class="match-row">
+      <span class="team-name">${escHtml(m.home)}</span>
+      <div class="score-group">
+        <input type="number" min="0" max="99" class="score-inp" value="${vh}"
+          oninput="setG('${kh}',this.value);refreshStd('std-${g.id}','${g.id}')"
+          placeholder="0">
+        <span class="score-sep">–</span>
+        <input type="number" min="0" max="99" class="score-inp" value="${va}"
+          oninput="setG('${ka}',this.value);refreshStd('std-${g.id}','${g.id}')"
+          placeholder="0">
+      </div>
+      <span class="team-name right">${escHtml(m.away)}</span>
+    </div>`;
+  }).join('');
+
+  const stdHtml = buildStdTable(g.id);
+  const isLast = gi === 11;
+
+  app.innerHTML = `
+  ${renderProgress()}
+  <div class="step-card">
+    <div class="step-card-header">
+      <div class="step-icon">⚽</div>
+      <div>
+        <div class="step-title">Grupo ${g.id}</div>
+        <div class="step-sub">${g.teams.join(' · ')} · 6 partidos</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="info-box">
+        Escribe el <strong>marcador que predices</strong> para cada partido. La tabla de posiciones se actualiza automáticamente.
+      </div>
+      ${matchRows}
+      <div id="std-${g.id}" class="standings-mini">
+        ${stdHtml}
+      </div>
+    </div>
+  </div>
+  <div class="nav-btns">
+    ${gi > 0 ? `<button class="btn btn-ghost" onclick="stepIdx--;render()">← Anterior</button>` : ''}
+    <button class="btn" onclick="stepIdx++;render()">${isLast ? 'Ver Terceros →' : `Grupo ${GROUPS_DEF[gi+1].id} →`}</button>
+  </div>`;
+}
+
+function setG(key, val) {
+  WZ.groups[key] = val;
+}
+
+function refreshStd(containerId, gid) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = buildStdTable(gid);
+}
+
+function buildStdTable(gid) {
+  const s = calcGroupStandings(gid);
+  const hasAny = s.some(r => r.pj > 0);
+  if (!hasAny) return `<h4>Clasificación del Grupo ${gid}</h4><div style="font-size:0.75rem;color:var(--muted);padding:4px 0;">Introduce marcadores para ver la tabla</div>`;
+
+  const posClass = ['pos-1','pos-2','pos-3',''];
+  const rows = s.map((r,i) => {
+    const gdStr = r.gd > 0 ? `+${r.gd}` : `${r.gd}`;
+    const badge = i===0?'<span class="badge-classif">1°</span>':i===1?'<span class="badge-classif">2°</span>':i===2?'<span class="badge-third">3°</span>':'';
+    return `<tr>
+      <td><span class="${posClass[i]}">${i+1}</span></td>
+      <td>${escHtml(r.name)}${r.pj>0?badge:''}</td>
+      <td>${r.pj}</td><td>${r.pg}</td><td>${r.pe}</td><td>${r.pp}</td>
+      <td>${r.gf}</td><td>${r.gc}</td>
+      <td style="color:${r.gd>0?'var(--success)':r.gd<0?'#EF6666':'var(--muted)'}">${r.pj>0?gdStr:'-'}</td>
+      <td><span class="std-pts-val">${r.pts}</span></td>
+    </tr>`;
+  }).join('');
+
+  return `<h4>Clasificación del Grupo ${gid}</h4>
+  <table class="std-table">
+    <thead><tr><th>#</th><th style="text-align:left;">Equipo</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ================================================================
+// THIRDS DISPLAY (step 12 → shown after group 11, before KO)
+// ================================================================
+// Thirds are auto-calculated — no input needed. We show them as a summary
+// after all groups, then proceed to KO.
+// Actually we skip a dedicated "thirds" step and fold it into the done summary.
+// Groups(0-11) → KO(12-16) → Champ(17) → Done(18)
+
+// ================================================================
+// KO STEP
+// ================================================================
+function renderKO(app, phaseIdx) {
+  const phase = KO_PHASES[phaseIdx];
+  const mc = phase.count / 2;
+  const icons = ['🥊','⚡','🔥','🎖️','🏆'];
+
+  const matchCards = Array.from({length:mc}, (_,mi) => {
+    const rk = `${phase.id}_${mi}`;
+    const ph = WZ.ko[rk+'_h'] ?? '';
+    const pa = WZ.ko[rk+'_a'] ?? '';
+    const pht = WZ.ko[rk+'_ht'] || '';
+    const pat = WZ.ko[rk+'_at'] || '';
+    const teamOpts = (v) => `<option value="">— Equipo —</option>` +
+      ALL_TEAMS.map(t => `<option value="${t}"${t===v?' selected':''}>${t}</option>`).join('');
+    return `<div class="ko-match">
+      <div class="ko-match-num">Partido ${mi+1}</div>
+      <div class="ko-row">
+        <select class="ko-select" onchange="setKO('${rk}_ht',this.value)">${teamOpts(pht)}</select>
+        <input type="number" min="0" max="99" class="score-inp" value="${ph}"
+          oninput="setKO('${rk}_h',this.value)" placeholder="0">
+        <span class="score-sep">–</span>
+        <input type="number" min="0" max="99" class="score-inp" value="${pa}"
+          oninput="setKO('${rk}_a',this.value)" placeholder="0">
+        <select class="ko-select" onchange="setKO('${rk}_at',this.value)">${teamOpts(pat)}</select>
+      </div>
+    </div>`;
+  }).join('');
+
+  const nextLabels = ['Cuartos de Final →','Semifinales →','3° y 4° Puesto →','Final →','Campeón del Mundo →'];
+
+  app.innerHTML = `
+  ${renderProgress()}
+  <div class="step-card">
+    <div class="step-card-header">
+      <div class="step-icon">${icons[phaseIdx]}</div>
+      <div>
+        <div class="step-title">${phase.label}</div>
+        <div class="step-sub">${mc} partido${mc!==1?'s':''} · 3 pts exacto · 2 pts vencedor</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="info-box">Selecciona los <strong>equipos</strong> que crees que jugarán y escribe el <strong>marcador predicho</strong>.</div>
+      ${matchCards}
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="stepIdx--;render()">← Anterior</button>
+    <button class="btn" onclick="stepIdx++;render()">${nextLabels[phaseIdx]}</button>
+  </div>`;
+}
+
+function setKO(key, val) { WZ.ko[key] = val; }
+
+// ================================================================
+// CHAMPION STEP
+// ================================================================
+function renderChamp(app) {
+  const champ = WZ.champion || '';
+  const opts = `<option value="">— Elige el Campeón del Mundo —</option>` +
+    ALL_TEAMS.map(t => `<option value="${t}"${t===champ?' selected':''}>${t}</option>`).join('');
+
+  app.innerHTML = `
+  ${renderProgress()}
+  <div class="step-card">
+    <div class="step-card-header">
+      <div class="step-icon">🏆</div>
+      <div>
+        <div class="step-title">Campeón del Mundo</div>
+        <div class="step-sub">¡Vale 10 puntos! — La predicción más importante</div>
+      </div>
+    </div>
+    <div class="step-body" style="text-align:center;padding:28px 18px;">
+      <div style="font-size:4rem;margin-bottom:14px;">🏆</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:3px;color:var(--muted);margin-bottom:4px;">¿QUIÉN LEVANTARÁ LA COPA?</div>
+      <select class="champ-select" onchange="WZ.champion=this.value;renderChampDisplay()">${opts}</select>
+      <div id="champ-display" style="margin-top:16px;min-height:40px;">
+        ${champ ? `<div style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:var(--gold);">⭐ ${escHtml(champ)} ⭐</div>` : ''}
+      </div>
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="stepIdx--;render()">← Anterior</button>
+    <button class="btn" onclick="finishAndDone()">¡Ver Resumen y Descargar PDF! →</button>
+  </div>`;
+}
+
+function renderChampDisplay() {
+  const el = document.getElementById('champ-display');
+  if (el && WZ.champion) {
+    el.innerHTML = `<div style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:var(--gold);">⭐ ${escHtml(WZ.champion)} ⭐</div>`;
+  }
+}
+
+function finishAndDone() {
+  saveToApp();
+  stepIdx = 18;
+  render();
+}
+
+// ================================================================
+// DONE STEP
+// ================================================================
+function renderDone(app) {
+  const thirds = calcBest8Thirds();
+  const groupMatches = GROUPS_DEF.reduce((s,g) => s + buildMatches(g.teams).length, 0);
+  const filledGroup = Object.keys(WZ.groups).filter(k => k.endsWith('_h') && WZ.groups[k] !== '').length;
+  const filledKO = Object.keys(WZ.ko).filter(k => k.endsWith('_h') && WZ.ko[k] !== '').length;
+
+  const groupSummaryRows = GROUPS_DEF.map(g => {
+    const s = calcGroupStandings(g.id);
+    return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.82rem;">
+      <span style="font-family:'Bebas Neue',cursive;color:var(--gold);min-width:70px;display:inline-block;letter-spacing:1px;">Grupo ${g.id}</span>
+      <span>1° ${escHtml(s[0].name)}</span>
+      <span style="color:var(--muted);margin:0 6px;">·</span>
+      <span>2° ${escHtml(s[1].name)}</span>
+      <span style="color:var(--muted);margin:0 6px;">·</span>
+      <span style="color:#CD7F32;">3° ${escHtml(s[2].name)}</span>
+    </div>`;
+  }).join('');
+
+  const thirdsHtml = thirds.length > 0
+    ? thirds.map((t,i) => `<div class="third-row">
+        <span class="third-num">${i+1}</span>
+        <div class="third-info">
+          <div class="third-team">${escHtml(t.team)}</div>
+          <div class="third-meta">Grupo ${t.group} · ${t.pts} pts · DG ${t.gd>=0?'+':''}${t.gd}</div>
+        </div>
+      </div>`).join('')
+    : `<div style="color:var(--muted);font-size:0.82rem;">No hay suficientes grupos con resultados.</div>`;
+
+  app.innerHTML = `
+  <div style="text-align:center;margin-bottom:24px;">
+    <div style="font-size:3rem;">🎉</div>
+    <div style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;color:var(--gold);">¡Predicciones Listas!</div>
+    <div style="font-size:0.88rem;color:var(--muted);margin-top:6px;">Las predicciones de <strong style="color:var(--text)">${escHtml(WZ.name)}</strong> han sido guardadas.</div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="summary-val">${filledGroup}/${groupMatches}</div>
+      <div class="summary-lbl">Partidos Grupo</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-val">${thirds.length}/8</div>
+      <div class="summary-lbl">Terceros</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-val">${filledKO}</div>
+      <div class="summary-lbl">Eliminatorias</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-val" style="color:${WZ.champion?'var(--gold)':'var(--muted)'};">${WZ.champion?'✓':'✗'}</div>
+      <div class="summary-lbl">Campeón</div>
+    </div>
+  </div>
+
+  ${WZ.champion ? `<div style="background:rgba(245,166,35,0.08);border:2px solid rgba(245,166,35,0.3);border-radius:10px;padding:14px;text-align:center;margin-bottom:18px;">
+    <div style="font-size:0.62rem;letter-spacing:3px;color:var(--muted);margin-bottom:4px;">CAMPEÓN PREDICHO</div>
+    <div style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:var(--gold);">🏆 ${escHtml(WZ.champion)}</div>
+  </div>` : ''}
+
+  <div style="background:var(--blue-panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:16px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Clasificados por Grupo (automático)</div>
+    ${groupSummaryRows}
+  </div>
+
+  <div style="background:var(--blue-panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:20px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Los 8 Mejores Terceros (automático)</div>
+    <div class="thirds-list">${thirdsHtml}</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <button class="btn btn-success" onclick="downloadMyPDF()">⬇️ Descargar mi PDF de predicciones</button>
+    <button class="btn btn-ghost" onclick="stepIdx=0;render()">✏️ Editar predicciones</button>
+    <button class="btn btn-ghost" onclick="stepIdx=-1;WZ.name='';WZ.groups={};WZ.ko={};WZ.champion='';render()">👤 Nuevo jugador</button>
+  </div>`;
+}
+
+// ================================================================
+// PDF GENERATION — player summary PDF
+// ================================================================
+function downloadMyPDF() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando PDF...';
+
+  function loadScript(src, cb) {
+    if (document.querySelector(`script[src="${src}"]`)) { cb(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = cb;
+    s.onerror = () => { btn.disabled=false; btn.textContent='⬇️ Descargar mi PDF'; alert('Error cargando librería. Revisa tu conexión.'); };
+    document.head.appendChild(s);
+  }
+
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => {
+    generatePlayerPDF();
+    btn.disabled = false;
+    btn.textContent = '⬇️ Descargar mi PDF de predicciones';
+  });
+}
+
+function generatePlayerPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, mg = 10;
+  const cW = W - mg*2;
+
+  // COLOR HELPERS
+  const sf = (c) => doc.setFillColor(...c);
+  const sd = (c) => doc.setDrawColor(...c);
+  const st = (c) => doc.setTextColor(...c);
+  const DARK  = [10,14,26], GOLD=[245,166,35], PANEL=[17,27,48], BORDER=[35,52,80];
+  const TEXT  = [232,238,247], MUTED=[122,139,170], GREEN=[6,167,125], BRONZE=[205,127,50];
+  const WHITE = [255,255,255];
+  const lw = (w) => doc.setLineWidth(w);
+
+  let y = 0;
+  let pageNum = 0;
+
+  function newPage() {
+    if (pageNum > 0) doc.addPage();
+    pageNum++;
+    // Dark background
+    sf(DARK); doc.rect(0,0,W,H,'F');
+    // Header bar
+    sf(PANEL); doc.rect(0,0,W,22,'F');
+    sf(GOLD); lw(0); doc.rect(0,21.5,W,0.7,'F');
+    // Trophy & title
+    st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    doc.text('POLLA MUNDIAL 2026', mg, 13);
+    st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    doc.text('PREDICCIONES PERSONALES', mg, 18.5);
+    // Player name right
+    st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(WZ.name.toUpperCase(), W-mg, 11, {align:'right'});
+    st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(6);
+    doc.text(`Pagina ${pageNum}`, W-mg, 18.5, {align:'right'});
+
+    y = 27;
+  }
+
+  function checkY(needed) {
+    if (y + needed > H - 12) newPage();
+  }
+
+  function sectionTitle(title, icon='') {
+    checkY(10);
+    sf(PANEL); sd(BORDER); lw(0.3);
+    doc.roundedRect(mg, y, cW, 7, 1,1,'FD');
+    sf(GOLD); doc.rect(mg, y, 2.5, 7, 'F');
+    st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text((icon?icon+' ':'')+title, mg+6, y+5);
+    y += 9;
+  }
+
+  function drawGroupCard(g) {
+    const matches = buildMatches(g.teams);
+    const standings = calcGroupStandings(g.id);
+    const cardH = 10 + matches.length * 8 + 4 + 10 + standings.length * 6 + 4;
+    checkY(cardH);
+
+    // Card bg
+    sf(PANEL); sd(BORDER); lw(0.25);
+    doc.roundedRect(mg, y, cW, cardH, 2,2,'FD');
+
+    // Group header
+    sf([22,34,60]); doc.roundedRect(mg, y, cW, 7, 2,2,'F');
+    sf([22,34,60]); doc.rect(mg, y+4, cW, 3, 'F');
+    st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text(`GRUPO ${g.id}  ·  ${g.teams.join(' · ')}`, mg+3, y+5);
+
+    let ry = y + 9;
+
+    // Matches
+    st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(5.5);
+    doc.text('LOCAL', W/2-10, ry-1.5);
+    doc.text('VISITANTE', W/2+6, ry-1.5);
+    sd([30,45,70]); lw(0.15); doc.line(mg+2, ry, mg+cW-2, ry);
+    ry += 2;
+
+    matches.forEach((m, mi) => {
+      const kh = `${g.id}_${mi}_h`, ka = `${g.id}_${mi}_a`;
+      const vh = WZ.groups[kh] ?? '—';
+      const va = WZ.groups[ka] ?? '—';
+      const hasScore = WZ.groups[kh] !== undefined && WZ.groups[kh] !== '';
+
+      // Home team
+      st(TEXT); doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+      const hn = m.home.length > 16 ? m.home.slice(0,15)+'.' : m.home;
+      const an = m.away.length > 16 ? m.away.slice(0,15)+'.' : m.away;
+      doc.text(hn, mg+3, ry+3.5);
+      doc.text(an, W/2+2, ry+3.5);
+
+      // Score box
+      const bx = W/2 - 14;
+      sf(DARK); sd(hasScore?GOLD:BORDER); lw(0.3);
+      doc.roundedRect(bx, ry, 8, 6, 1,1,'FD');
+      doc.roundedRect(bx+14, ry, 8, 6, 1,1,'FD');
+      st(MUTED); doc.setFontSize(7); doc.text('-', bx+11, ry+4.5, {align:'center'});
+      if (hasScore) {
+        st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+        doc.text(String(vh), bx+4, ry+4.5, {align:'center'});
+        doc.text(String(va), bx+18, ry+4.5, {align:'center'});
+      }
+
+      ry += 8;
+      if (mi < matches.length-1) { sd([25,38,60]); lw(0.12); doc.line(mg+2, ry-2, mg+cW-2, ry-2); }
+    });
+
+    // Standings mini
+    ry += 2;
+    st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(5.5);
+    doc.text('TABLA DE POSICIONES', mg+3, ry);
+    sd([30,45,70]); lw(0.12); doc.line(mg+2, ry+1, mg+cW-2, ry+1);
+    ry += 3;
+
+    const posColors = [GOLD,[160,172,192],BRONZE,MUTED];
+    const headers = ['#','Equipo','PJ','PG','PE','PP','GF','GC','DG','PTS'];
+    const colX = [mg+3, mg+9, mg+cW-46, mg+cW-40, mg+cW-34, mg+cW-28, mg+cW-22, mg+cW-16, mg+cW-10, mg+cW-3];
+    st(MUTED); doc.setFontSize(5);
+    headers.forEach((h,i) => doc.text(h, colX[i], ry, i>1?{align:'center'}:{}));
+    ry += 2;
+    sd([25,38,60]); lw(0.1); doc.line(mg+2, ry-0.5, mg+cW-2, ry-0.5);
+    ry += 1;
+
+    standings.forEach((row,i) => {
+      const gdStr = row.gd >= 0 ? `+${row.gd}` : `${row.gd}`;
+      st(posColors[i]); doc.setFont('helvetica','bold'); doc.setFontSize(5.5);
+      doc.text(`${i+1}`, colX[0], ry);
+      st(TEXT); doc.setFont('helvetica', i<2?'bold':'normal'); doc.setFontSize(5.5);
+      doc.text(row.name.length>14?row.name.slice(0,13)+'.':row.name, colX[1], ry);
+      st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(5.5);
+      [row.pj,row.pg,row.pe,row.pp,row.gf,row.gc].forEach((v,vi) => doc.text(`${v}`, colX[vi+2], ry, {align:'center'}));
+      doc.text(row.pj>0?gdStr:'-', colX[8], ry, {align:'center'});
+      st(GOLD); doc.setFont('helvetica','bold');
+      doc.text(`${row.pts}`, colX[9], ry, {align:'right'});
+      ry += 5.5;
+      if (i < standings.length-1) { sd([20,32,55]); lw(0.08); doc.line(mg+2, ry-1.5, mg+cW-2, ry-1.5); }
+    });
+
+    y = y + cardH + 6;
+  }
+
+  // ---- BUILD PDF ----
+  newPage();
+
+  // Champion highlight on page 1
+  if (WZ.champion) {
+    sf([20,28,50]); sd(GOLD); lw(0.5);
+    doc.roundedRect(mg, y, cW, 14, 2,2,'FD');
+    st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text('CAMPEON PREDICHO: ' + WZ.champion.toUpperCase(), W/2, y+9, {align:'center'});
+    st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(6);
+    doc.text('Vale 10 puntos si acierta', W/2, y+13, {align:'center'});
+    y += 18;
+  }
+
+  // Groups
+  sectionTitle('FASE DE GRUPOS');
+  GROUPS_DEF.forEach(g => drawGroupCard(g));
+
+  // Thirds
+  checkY(12);
+  sectionTitle('MEJORES 8 TERCEROS CLASIFICADOS', '🔶');
+  const thirds = calcBest8Thirds();
+  if (thirds.length === 0) {
+    st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.text('No hay grupos con resultados suficientes.', mg+3, y+5);
+    y += 10;
+  } else {
+    const cols = 4;
+    const tw = (cW - (cols-1)*3) / cols;
+    thirds.forEach((t,i) => {
+      const col = i % cols;
+      const row = Math.floor(i/cols);
+      const tx = mg + col*(tw+3);
+      const ty = y + row*16;
+      checkY(ty - y + 18);
+      sf(PANEL); sd(BORDER); lw(0.2);
+      doc.roundedRect(tx, ty, tw, 14, 1,1,'FD');
+      sf(BRONZE); doc.roundedRect(tx, ty, tw, 3.5, 1,1,'F');
+      doc.rect(tx, ty+2, tw, 1.5, 'F');
+      st(WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(5.5);
+      doc.text(`${i+1}° CLASIFICADO`, tx+tw/2, ty+2.8, {align:'center'});
+      st(TEXT); doc.setFont('helvetica','bold'); doc.setFontSize(6.5);
+      const tn = t.team.length>12?t.team.slice(0,11)+'.':t.team;
+      doc.text(tn, tx+tw/2, ty+8.5, {align:'center'});
+      st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(5);
+      doc.text(`Gpo ${t.group} · ${t.pts}pts · DG${t.gd>=0?'+':''}${t.gd}`, tx+tw/2, ty+12.5, {align:'center'});
+    });
+    y += Math.ceil(thirds.length/4)*16 + 6;
+  }
+
+  // KO Phases
+  KO_PHASES.forEach((phase, phaseIdx) => {
+    const mc = phase.count / 2;
+    checkY(14);
+    sectionTitle(phase.label.toUpperCase(), ['🥊','⚡','🔥','🎖️','🏆'][phaseIdx]);
+
+    const cols = Math.min(mc, 4);
+    const mw = (cW - (cols-1)*3) / cols;
+
+    Array.from({length:mc},(_,mi) => {
+      const col = mi % cols;
+      const row = Math.floor(mi/cols);
+      const mx = mg + col*(mw+3);
+
+      if (col === 0 && row > 0) { checkY(22); }
+      const my = y + row * 22;
+
+      const rk = `${phase.id}_${mi}`;
+      const ph = WZ.ko[rk+'_h'];
+      const pa = WZ.ko[rk+'_a'];
+      const pht = WZ.ko[rk+'_ht'] || '';
+      const pat = WZ.ko[rk+'_at'] || '';
+      const hasScore = ph !== undefined && ph !== '';
+
+      sf(PANEL); sd(BORDER); lw(0.2);
+      doc.roundedRect(mx, my, mw, 20, 1,1,'FD');
+      st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(5);
+      doc.text(`Partido ${mi+1}`, mx+2, my+3.5);
+
+      // Home row
+      const hname = pht ? (pht.length>14?pht.slice(0,13)+'.':pht) : '(equipo local)';
+      const aname = pat ? (pat.length>14?pat.slice(0,13)+'.':pat) : '(equipo visitante)';
+      st(TEXT); doc.setFont('helvetica','normal'); doc.setFontSize(6);
+      doc.text(hname, mx+2, my+8);
+      doc.text(aname, mx+2, my+13.5);
+
+      // Score boxes
+      sf(DARK); sd(hasScore?GOLD:BORDER); lw(0.25);
+      doc.roundedRect(mx+mw-17, my+5, 6.5, 5, 1,1,'FD');
+      doc.roundedRect(mx+mw-9, my+5, 6.5, 5, 1,1,'FD');
+      doc.roundedRect(mx+mw-17, my+11, 6.5, 5, 1,1,'FD');
+      doc.roundedRect(mx+mw-9, my+11, 6.5, 5, 1,1,'FD');
+      st(MUTED); doc.setFontSize(6.5);
+      doc.text('-', mx+mw-10.8, my+8.8, {align:'center'});
+      doc.text('-', mx+mw-10.8, my+14.3, {align:'center'});
+
+      if (hasScore) {
+        st(GOLD); doc.setFont('helvetica','bold'); doc.setFontSize(7);
+        doc.text(String(ph), mx+mw-13.7, my+8.8, {align:'center'});
+        doc.text(String(pa), mx+mw-5.7, my+8.8, {align:'center'});
+        doc.text(String(pa), mx+mw-13.7, my+14.3, {align:'center'});
+        doc.text(String(ph), mx+mw-5.7, my+14.3, {align:'center'});
+      }
+    });
+    y += Math.ceil(mc/4) * 22 + 4;
+  });
+
+  // Footer on last page
+  st(MUTED); doc.setFont('helvetica','normal'); doc.setFontSize(5.5);
+  doc.text(`Polla Mundial 2026 · Predicciones de ${WZ.name} · Generado automaticamente`, W/2, H-5, {align:'center'});
+
+  const safeName = WZ.name.replace(/[^a-z0-9]/gi,'_').slice(0,25) || 'jugador';
+  doc.save(`predicciones_mundial_2026_${safeName}.pdf`);
+}
+
+// ================================================================
+// UTILS
+// ================================================================
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ================================================================
+// INIT
+// ================================================================
+render();
+</script>
+</body>
+</html>
