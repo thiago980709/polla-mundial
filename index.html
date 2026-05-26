@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mundial 2026 Polla</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-trophy">🏆</span>
+      <div class="logo-text">
+        <h1>MUNDIAL 2026</h1>
+        <span>POLLA DE PREDICCIONES</span>
+      </div>
+    </div>
+    <div class="header-player" id="header-player">
+      <div id="player-name">Ingresa tu nombre</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Content rendered by JavaScript -->
+  </main>
+
+  <!-- Firebase Web SDK (compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- jsPDF library (loaded dynamically but available globally) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Modular JavaScript imports (in dependency order) -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/standings.js"></script>
+  <script src="js/ko-logic.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/wizard-state.js"></script>
+  <script src="js/pdf.js"></script>
+  <script src="js/wizard-ui.js"></script>
+
+  <!-- Initialize wizard on page load -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initFirebase();
+      render();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+MUNDIAL 2026 POLLA - ESTRUCTURA MODULAR COMPLETA
+================================================
+
+ARCHIVOS PRINCIPALES
+--------------------
+✓ index.html (58 líneas) - Página limpia que importa módulos
+✓ admin.html - Dashboard de administrador (original)
+
+MÓDULOS JAVASCRIPT (/js/)
+-------------------------
+✓ config.js - Datos del torneo (12 grupos, 6 fases KO, Firebase config)
+✓ utils.js - Funciones auxiliares (slugify, playerDocId, etc.)
+✓ standings.js - Cálculos de standings y terceros
+✓ ko-logic.js - Lógica de eliminatorias y auto-fill de equipos
+✓ firebase.js - Integración Firestore y persistencia
+✓ wizard-state.js - Estado global WZ y progreso del wizard
+✓ pdf.js - Generación de PDF con 🎨 EDITA AQUÍ markers
+✓ wizard-ui.js - Renderizado de interfaz de usuario
+
+ESTILOS (/css/)
+---------------
+✓ styles.css - Hoja de estilos completa (separada del HTML)
+
+DIRECTORIOS PREPARADOS (/admin/)
+--------------------------------
+📁 /admin/js/ - Listo para módulos del admin
+📁 /admin/css/ - Listo para estilos del admin
+
+DOCUMENTACIÓN
+-------------
+✓ README.md - Guía completa del proyecto
+✓ DEVELOPER_GUIDE.md - Quick start para desarrolladores
+✓ PDF_CUSTOMIZATION.md - Guía de edición de PDF
+✓ REFACTORING_SUMMARY.md - Resumen de cambios
+✓ PROJECT_STRUCTURE.txt - Este archivo
+
+CARACTERÍSTICAS PRINCIPALES
+---------------------------
+✓ Auto-llenado de equipos en fases KO desde:
+  - Ganadores de partidos previos
+  - Clasificados de grupos (1ero y 2do)
+  - Mejores terceros (con orden de prioridad por grupo)
+
+✓ Manejo de empates:
+  - Activa campos de penales automáticamente
+  - Resuelve ganador por resultado de penales
+
+✓ PDF personalizable:
+  - Zonas claramente marcadas con 🎨 EDITA AQUÍ
+  - Paleta de colores separada
+  - Funciones de dibujo personalizables
+
+✓ Firebase Firestore:
+  - Sincronización automática
+  - localStorage fallback
+  - Documentos por jugador (player_<slug>)
+
+✓ Wizard de 20 pasos:
+  1. Bienvenida
+  2-13. Grupos (12 grupos: A-L)
+  14-19. Fases KO (6 fases: r32, r16, qf, sf, tp, final)
+  20. Campeón y resumen
+
+CAMBIOS DESDE REFACTORIZACIÓN
+----------------------------
+ANTES: 1,500+ líneas en 1 archivo (HTML + CSS + JS mezclado)
+DESPUÉS: 
+  - 8 módulos JS especializados (~2,500 líneas distribuidas)
+  - 1 hoja CSS separada (~400 líneas)
+  - 1 HTML limpio (58 líneas)
+  - 4 archivos de documentación
+
+VENTAJAS
+--------
+✓ Fácil de mantener - cada módulo tiene responsabilidad única
+✓ Fácil de debuggear - bugs localizados por módulo
+✓ Fácil de escalar - agregar features sin afectar otros módulos
+✓ Fácil de customizar - PDF con markers claramente identificados
+✓ Profesional - estructura senior pronta para producción
+
+PRÓXIMOS PASOS
+--------------
+1. Abrir index.html en navegador
+2. Verificar que funciona igual que antes
+3. Leer DEVELOPER_GUIDE.md para agregar features
+4. (Opcional) Refactorizar admin.html al mismo patrón
+
+ESTADO ACTUAL
+-------------
+✓ Refactorización completada
+✓ Estructura lista para producción
+✓ Documentación completa
+✓ PDF customization zones marcadas
+
+Santiago's Mundial 2026 Polla - Versión Modular 2026
