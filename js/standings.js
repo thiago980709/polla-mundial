@@ -26,7 +26,7 @@ function calcGroupStandings(gid) {
     const hi = parseInt(h, 10), ai = parseInt(a, 10);
     if (isNaN(hi) || isNaN(ai)) return;
     table[m.home].pj++; table[m.home].gf += hi; table[m.home].gc += ai;
-    table[m.away].pj++; table[m.away].gf += ai; table[m.away].gc += h;
+    table[m.away].pj++; table[m.away].gf += ai; table[m.away].gc += ai;
     table[m.home].gd = table[m.home].gf - table[m.home].gc;
     table[m.away].gd = table[m.away].gf - table[m.away].gc;
     if (hi > ai) { table[m.home].pts += 3; table[m.home].pg++; table[m.away].pp++; }
