@@ -1580,6 +1580,8 @@ const FIREBASE_CONFIG = {
   appId: "1:1055596239418:web:9805e02f0d326e7a30b303"
 };
 const FIREBASE_COLLECTION = 'predicciones';
+const REALS_COLLECTION = 'resultados';
+const REALS_DOC_ID = 'real';
 let adminDb = null;
 let firebaseEnabled = false;
 
@@ -1599,11 +1601,7 @@ function playerDocId(name) {
 let state = loadState();
 
 function loadState() {
-  try {
-    const s = localStorage.getItem('polla_mundial_2026');
-    if (s) return JSON.parse(s);
-  } catch(e) {}
-  return {
+  const baseState = {
     players: [],
     currentPlayer: null,
     groupPlayerView: null,
@@ -1611,12 +1609,34 @@ function loadState() {
     data: {}, // data[playerId] = { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'', locked:false }
     real: { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' }
   };
+  try {
+    const s = localStorage.getItem('polla_mundial_2026');
+    if (s) {
+      const parsed = JSON.parse(s);
+      baseState.players = parsed.players || [];
+      baseState.currentPlayer = parsed.currentPlayer || null;
+      baseState.groupPlayerView = parsed.groupPlayerView || null;
+      baseState.koPlayerView = parsed.koPlayerView || null;
+      baseState.data = parsed.data || {};
+    }
+  } catch(e) {}
+  return baseState;
 }
 
 function saveState() {
-  try { localStorage.setItem('polla_mundial_2026', JSON.stringify(state)); } catch(e) {}
+  try {
+    const stateToSave = {
+      players: state.players,
+      currentPlayer: state.currentPlayer,
+      groupPlayerView: state.groupPlayerView,
+      koPlayerView: state.koPlayerView,
+      data: state.data,
+    };
+    localStorage.setItem('polla_mundial_2026', JSON.stringify(stateToSave));
+  } catch(e) {}
   if (firebaseEnabled) {
     syncStateToFirestore();
+    syncRealToFirestore();
   }
 }
 
@@ -1701,6 +1721,43 @@ async function syncStateToFirestore() {
   }
 }
 
+async function loadFirestoreRealResults() {
+  if (!initFirebaseAdmin()) return;
+  try {
+    const doc = await adminDb.collection(REALS_COLLECTION).doc(REALS_DOC_ID).get();
+    if (doc.exists) {
+      const data = doc.data();
+      state.real = {
+        groups: data.groups || {},
+        classif: data.classif || {},
+        thirds: data.thirds || {},
+        ko: data.ko || {},
+        champion: data.champion || '',
+      };
+    } else {
+      state.real = { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' };
+    }
+  } catch (e) {
+    console.warn('Firestore real results load failed:', e);
+  }
+}
+
+async function syncRealToFirestore() {
+  if (!initFirebaseAdmin()) return;
+  try {
+    await adminDb.collection(REALS_COLLECTION).doc(REALS_DOC_ID).set({
+      groups: state.real.groups || {},
+      classif: state.real.classif || {},
+      thirds: state.real.thirds || {},
+      ko: state.real.ko || {},
+      champion: state.real.champion || '',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+  } catch (e) {
+    console.warn('Firestore real results sync failed:', e);
+  }
+}
+
 async function deleteFirestorePlayer(pid) {
   if (!initFirebaseAdmin()) return;
   try {
@@ -1729,6 +1786,7 @@ function doAdminLogin() {
 async function initAdminApp() {
   if (initFirebaseAdmin()) {
     await loadFirestorePlayers();
+    await loadFirestoreRealResults();
   }
   renderPlayerTabs();
   updateGlobalScores();
