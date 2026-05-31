@@ -51,16 +51,22 @@ async function startWizard() {
   if (!name) { alert('Por favor ingresa tu nombre'); return; }
   WZ.name = name;
   WZ.pid = playerDocId(name);
+  const appState = loadAppState();
+  const localState = appState?.data?.[WZ.pid] || {};
   initFirebase();
+
+  let loadedState = localState;
   if (firestoreEnabled) {
     const fbData = await dbLoadPlayer(name);
-    if (fbData) {
-      WZ.groups = fbData.groups || {};
-      WZ.ko = fbData.ko || {};
-      WZ.champion = fbData.champion || '';
-      WZ.locked = fbData.locked || false;
-    }
+    if (fbData) loadedState = { ...loadedState, ...fbData };
   }
+  if (loadedState) {
+    WZ.groups = loadedState.groups || {};
+    WZ.ko = loadedState.ko || {};
+    WZ.champion = loadedState.champion || '';
+    WZ.locked = loadedState.locked || false;
+  }
+
   stepIdx = WZ.locked ? 19 : 0;
   render();
 }
@@ -106,8 +112,8 @@ function renderGroup(app, gi) {
     </div>
   </div>
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="stepIdx--;render()">← Anterior</button>
-    <button class="btn" onclick="stepIdx++;render()">Siguiente →</button>
+    <button class="btn btn-ghost" onclick="saveWizardProgressLocal(); stepIdx--; render()">← Anterior</button>
+    <button class="btn" onclick="saveWizardProgressLocal(); stepIdx++; render()">Siguiente →</button>
   </div>`;
 }
 
@@ -172,13 +178,13 @@ function renderKO(app, phaseIdx) {
     if (resolvedHome && WZ.ko[rk+'_ht'] !== resolvedHome) WZ.ko[rk+'_ht'] = resolvedHome;
     if (resolvedAway && WZ.ko[rk+'_at'] !== resolvedAway) WZ.ko[rk+'_at'] = resolvedAway;
 
-    const penaltyHtml = drawPred ? `
-      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;">
+    const penaltyHtml = `
+      <div id="pen-${rk}" style="display:${drawPred ? 'flex' : 'none'};align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;">
         <div style="font-size:0.75rem;color:#3B82F6;letter-spacing:1px;min-width:90px;">Penales</div>
         <input type="number" min="0" max="99" class="score-inp" style="width:46px;" value="${penaltyPredH}"${disabledAttr} onchange="setKO('${rk}_ph',this.value)" placeholder="0">
         <span class="score-sep">–</span>
         <input type="number" min="0" max="99" class="score-inp" style="width:46px;" value="${penaltyPredA}"${disabledAttr} onchange="setKO('${rk}_pa',this.value)" placeholder="0">
-      </div>` : '';
+      </div>`;
 
     return `<div class="ko-match">
       <div class="ko-match-num">Partido ${matchNum}</div>
@@ -212,8 +218,8 @@ function renderKO(app, phaseIdx) {
     </div>
   </div>
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="stepIdx--;render()">← Anterior</button>
-    <button class="btn" onclick="stepIdx++;render()">${nextLabels[phaseIdx]}</button>
+    <button class="btn btn-ghost" onclick="saveWizardProgressLocal(); stepIdx--; render()">← Anterior</button>
+    <button class="btn" onclick="saveWizardProgressLocal(); stepIdx++; render()">${nextLabels[phaseIdx]}</button>
   </div>`;
 }
 
@@ -238,7 +244,7 @@ function renderChamp(app) {
     </div>
   </div>
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="stepIdx--;render()">← Anterior</button>
+    <button class="btn btn-ghost" onclick="saveWizardProgressLocal(); stepIdx--; render()">← Anterior</button>
     <button class="btn" onclick="finishAndDone()">Terminar →</button>
   </div>`;
   renderChampDisplay();

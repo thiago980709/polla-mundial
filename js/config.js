@@ -31,7 +31,7 @@ const KO_MATCH_SOURCES = {
     '2º Grupo A vs 2º Grupo B',
     '1º Grupo E vs 3º Grupo A/B/C/D/F',
     '1º Grupo F vs 2º Grupo C',
-    '1º Grupo E vs 2º Grupo F',
+    '1º Grupo C vs 2º Grupo F',
     '1º Grupo I vs 3º Grupo C/D/F/G/H',
     '2º Grupo E vs 2º Grupo I',
     '1º Grupo A vs 3º Grupo C/E/F/H/I',
@@ -45,6 +45,9 @@ const KO_MATCH_SOURCES = {
     '1º Grupo K vs 3º Grupo D/E/I/J/L',
     '2º Grupo D vs 2º Grupo G',
   ],
+  // Nota: aquí se definen los cruces de Octavos de Final con correspondencia a los partidos 74-88.
+  // Si hay equipos repetidos en los partidos 74 y 76 revisa los objetos `match:74` y `match:76`
+  // en `KO_TEAM_SOURCES.r16` y ajusta `KO_MATCH_SOURCES.r16` si es necesario.
   r16: [
     'Ganador 74 vs Ganador 77',
     'Ganador 73 vs Ganador 75',
@@ -74,7 +77,7 @@ const KO_TEAM_SOURCES = {
     { home:{type:'group',group:'A',pos:2}, away:{type:'group',group:'B',pos:2} },
     { home:{type:'group',group:'E',pos:1}, away:{type:'third',groups:['A','B','C','D','F']} },
     { home:{type:'group',group:'F',pos:1}, away:{type:'group',group:'C',pos:2} },
-    { home:{type:'group',group:'E',pos:1}, away:{type:'group',group:'F',pos:2} },
+    { home:{type:'group',group:'C',pos:1}, away:{type:'group',group:'F',pos:2} },
     { home:{type:'group',group:'I',pos:1}, away:{type:'third',groups:['C','D','F','G','H']} },
     { home:{type:'group',group:'E',pos:2}, away:{type:'group',group:'I',pos:2} },
     { home:{type:'group',group:'A',pos:1}, away:{type:'third',groups:['C','E','F','H','I']} },

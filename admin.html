@@ -1478,6 +1478,7 @@ function getKoMatchWinner(rkey, data) {
   if (isNaN(hi) || isNaN(ai)) return '';
   if (hi > ai) return ht;
   if (ai > hi) return at;
+  // En todas las fases KO, si el partido termina empatado se define el ganador por penales.
   const ph = data[rkey+'_ph'];
   const pa = data[rkey+'_pa'];
   if (ph === '' || pa === '' || ph == null || pa == null) return '';
@@ -1518,20 +1519,68 @@ function getGroupPlaceName(gid, pos, sourceType, pid) {
   return standings[pos-1] && standings[pos-1].pj > 0 ? standings[pos-1].name : '';
 }
 
-function getBestThirdCandidates(groups, sourceType, pid) {
+function getKoThirdSlots() {
+  const slots = [];
+  Object.entries(KO_TEAM_SOURCES).forEach(([phaseId, matches]) => {
+    matches.forEach((match, mi) => {
+      ['home', 'away'].forEach(side => {
+        const token = match[side];
+        if (token && token.type === 'third') {
+          slots.push({ phaseId, mi, side, groups: token.groups });
+        }
+      });
+    });
+  });
+  return slots;
+}
+
+function selectThirdTeam(groups, sourceType, pid, data, usedTeams) {
+  const thirds = calcBest8Thirds(sourceType, pid);
+  const qualified = new Map(thirds.map(t => [t.group, t.team]));
+  for (const group of groups) {
+    const team = qualified.get(group);
+    if (team && !usedTeams.has(team)) return team;
+  }
+  for (const group of groups) {
+    const standings = calcGroupStandings(group, sourceType, pid);
+    const team = standings[2] && standings[2].pj > 0 ? standings[2].name : '';
+    if (team && !usedTeams.has(team)) return team;
+  }
+  return '';
+}
+
+function getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data) {
+  const slots = getKoThirdSlots();
+  const used = new Set();
+  for (const slot of slots) {
+    if (slot.phaseId === phaseId && slot.mi === mi && slot.side === side) break;
+    const key = `${slot.phaseId}_${slot.mi}_${slot.side === 'home' ? 'ht' : 'at'}`;
+    const currentValue = data && data[key] ? String(data[key]).trim() : '';
+    if (currentValue) {
+      used.add(currentValue);
+      continue;
+    }
+    const selected = selectThirdTeam(slot.groups, sourceType, pid, data, used);
+    if (selected) used.add(selected);
+  }
+  return used;
+}
+
+function getBestThirdCandidates(groups, sourceType, pid, usedTeams = new Set()) {
   const thirds = calcBest8Thirds(sourceType, pid);
   const qualified = new Map(thirds.map(t => [t.group, t.team]));
   const candidates = groups
-    .filter(g => qualified.has(g))
     .map(g => qualified.get(g))
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter(team => !usedTeams.has(team));
   if (candidates.length > 0) return Array.from(new Set(candidates));
   return groups
     .map(g => {
       const standings = calcGroupStandings(g, sourceType, pid);
       return standings[2] && standings[2].pj > 0 ? standings[2].name : '';
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter(team => !usedTeams.has(team));
 }
 
 function resolveKoToken(phaseId, mi, side, sourceType, pid, data) {
@@ -1543,7 +1592,8 @@ function resolveKoToken(phaseId, mi, side, sourceType, pid, data) {
     return { value: team || '', options, fixed: !!team };
   }
   if (token.type === 'third') {
-    const options = getBestThirdCandidates(token.groups, sourceType, pid);
+    const used = getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data);
+    const options = getBestThirdCandidates(token.groups, sourceType, pid, used);
     if (options.length > 0) {
       return { value: options[0], options, fixed: true };
     }

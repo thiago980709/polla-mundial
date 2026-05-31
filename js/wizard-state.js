@@ -42,14 +42,51 @@ function renderProgress() {
   </div>`;
 }
 
+function saveWizardProgressLocal() {
+  const appState = loadAppState() || { players: [], data: {}, groupPlayerView: null, koPlayerView: null };
+  const pid = playerDocId(WZ.name || '');
+  if (!pid) return;
+  let player = appState.players.find(p => p.id === pid || p.name.toLowerCase() === String(WZ.name).toLowerCase());
+  if (!player) {
+    player = { id: pid, name: WZ.name };
+    appState.players.push(player);
+  } else {
+    player.id = pid;
+    player.name = WZ.name;
+  }
+  appState.data[pid] = {
+    groups: WZ.groups,
+    ko: WZ.ko,
+    champion: WZ.champion,
+    locked: WZ.locked || false,
+  };
+  appState.groupPlayerView = pid;
+  appState.koPlayerView = pid;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
+}
+
 function setG(key, val) {
   WZ.groups[key] = val;
+  saveWizardProgressLocal();
 }
 
 function setKO(key, val) {
   WZ.ko[key] = val;
+  saveWizardProgressLocal();
+  if (key.endsWith('_h') || key.endsWith('_a')) {
+    const rkey = key.split('_').slice(0, -1).join('_');
+    updateKoPenaltyVisibility(rkey);
+  }
   // No rerender aquí para que el teclado y el foco no se cierren
   // mientras el usuario escribe resultados en las fases KO.
+}
+
+function updateKoPenaltyVisibility(rkey) {
+  const el = document.getElementById(`pen-${rkey}`);
+  if (!el) return;
+  const h = WZ.ko[`${rkey}_h`];
+  const a = WZ.ko[`${rkey}_a`];
+  el.style.display = (h !== '' && a !== '' && h === a) ? 'flex' : 'none';
 }
 
 async function saveToApp() {
