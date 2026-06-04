@@ -10,6 +10,7 @@ const WZ = {
   ko: {},
   champion: '',
   locked: false,
+  gameClosed: false,
 };
 
 let stepIdx = -1;
@@ -62,7 +63,24 @@ function saveWizardProgressLocal() {
   };
   appState.groupPlayerView = pid;
   appState.koPlayerView = pid;
+  if (typeof WZ.gameClosed === 'boolean') {
+    appState.gameClosed = WZ.gameClosed;
+  }
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
+}
+
+async function loadGameClosedState() {
+  const appState = loadAppState() || {};
+  let closed = !!appState.gameClosed;
+  if (initFirebase()) {
+    const fbData = await dbLoadGameState();
+    if (fbData && typeof fbData.gameClosed === 'boolean') {
+      closed = fbData.gameClosed;
+      appState.gameClosed = closed;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
+    }
+  }
+  return closed;
 }
 
 function setG(key, val) {
@@ -123,6 +141,9 @@ async function saveToApp() {
   };
   appState.groupPlayerView = player.id;
   appState.koPlayerView = player.id;
+  if (typeof WZ.gameClosed === 'boolean') {
+    appState.gameClosed = WZ.gameClosed;
+  }
 
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
   await dbSavePlayer();

@@ -1207,9 +1207,14 @@
 
 <!-- PAGE: JUGADORES -->
 <div class="page" id="page-jugadores">
-  <div class="section-header">
+  <div class="section-header" style="gap:12px;flex-wrap:wrap;">
     <h2>Participantes</h2>
-    <div class="badge" id="player-count-badge">0 jugadores</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div class="badge" id="player-count-badge">0 jugadores</div>
+      <div class="badge" id="paid-total-badge">Pagaron: 0 · Premio: $0</div>
+      <button id="game-lock-button" class="btn btn-sm btn-danger" style="white-space:nowrap;" onclick="toggleGameClosed()">Cerrar juego</button>
+      <div id="game-lock-status" style="font-size:0.78rem;color:var(--muted);">Estado: abierto</div>
+    </div>
   </div>
   <div class="add-player-form">
     <input type="text" id="new-player-name" placeholder="Nombre del jugador..." maxlength="30">
@@ -1656,6 +1661,7 @@ function loadState() {
     currentPlayer: null,
     groupPlayerView: null,
     koPlayerView: null,
+    gameClosed: false,
     data: {}, // data[playerId] = { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'', locked:false }
     real: { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' }
   };
@@ -1667,6 +1673,7 @@ function loadState() {
       baseState.currentPlayer = parsed.currentPlayer || null;
       baseState.groupPlayerView = parsed.groupPlayerView || null;
       baseState.koPlayerView = parsed.koPlayerView || null;
+      baseState.gameClosed = parsed.gameClosed || false;
       baseState.data = parsed.data || {};
     }
   } catch(e) {}
@@ -1680,6 +1687,7 @@ function saveState() {
       currentPlayer: state.currentPlayer,
       groupPlayerView: state.groupPlayerView,
       koPlayerView: state.koPlayerView,
+      gameClosed: state.gameClosed,
       data: state.data,
     };
     localStorage.setItem('polla_mundial_2026', JSON.stringify(stateToSave));
@@ -1727,7 +1735,7 @@ async function loadFirestorePlayers() {
     snapshot.forEach(doc => {
       const data = doc.data();
       const pid = doc.id;
-      state.players.push({ id: pid, name: data.name || pid });
+      state.players.push({ id: pid, name: data.name || pid, paid: data.paid || false });
       state.data[pid] = {
         groups: data.groups || {},
         classif: data.classif || {},
@@ -1751,6 +1759,7 @@ async function syncPlayerToFirestore(pid) {
   try {
     await adminDb.collection(FIREBASE_COLLECTION).doc(pid).set({
       name: player.name,
+      paid: player.paid || false,
       groups: pdata.groups || {},
       classif: pdata.classif || {},
       thirds: pdata.thirds || {},
@@ -1784,6 +1793,7 @@ async function loadFirestoreRealResults() {
         ko: data.ko || {},
         champion: data.champion || '',
       };
+      state.gameClosed = data.gameClosed || state.gameClosed || false;
     } else {
       state.real = { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' };
     }
@@ -1840,6 +1850,7 @@ async function initAdminApp() {
   }
   renderPlayerTabs();
   updateGlobalScores();
+  updateGameLockUI();
   showPage('jugadores');
 }
 
@@ -1869,7 +1880,7 @@ function addPlayer() {
   const name = inp.value.trim();
   if (!name) return;
   const id = playerDocId(name);
-  state.players.push({ id, name });
+  state.players.push({ id, name, paid: false });
   if (!state.groupPlayerView) state.groupPlayerView = id;
   if (!state.koPlayerView) state.koPlayerView = id;
   saveState();
@@ -1877,6 +1888,14 @@ function addPlayer() {
   renderPlayersList();
   renderPlayerTabs();
   updateGlobalScores();
+}
+
+function togglePlayerPaid(id, paid) {
+  const player = state.players.find(p => p.id === id);
+  if (!player) return;
+  player.paid = !!paid;
+  saveState();
+  renderPlayersList();
 }
 
 function removePlayer(id) {
@@ -1899,6 +1918,12 @@ function renderPlayersList() {
   const empty = document.getElementById('no-players');
   const badge = document.getElementById('player-count-badge');
   badge.textContent = state.players.length + ' jugador' + (state.players.length!==1?'es':'');
+  const paidCount = state.players.filter(p => p.paid).length;
+  const totalPrize = paidCount * 50000;
+  const badgePaid = document.getElementById('paid-total-badge');
+  if (badgePaid) {
+    badgePaid.textContent = `Pagaron: ${paidCount} · Premio: $${totalPrize.toLocaleString('es-CO')}`;
+  }
   if (!state.players.length) {
     list.innerHTML = '';
     empty.style.display = 'block';
@@ -1907,15 +1932,20 @@ function renderPlayersList() {
   empty.style.display = 'none';
   list.innerHTML = state.players.map(p => {
     const pts = calcPlayerTotal(p.id);
-    return `<div style="background:var(--blue-panel);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:14px;">
+    const paid = !!p.paid;
+    return `<div style="background:var(--blue-panel);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:220px;">
         <div style="font-size:1.5rem;">👤</div>
         <div>
           <div style="font-weight:600;">${escHtml(p.name)}</div>
           <div style="font-size:0.72rem;color:var(--muted);letter-spacing:1px;">ID: ${p.id}</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:14px;">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--muted);">
+          <input type="checkbox" onchange="togglePlayerPaid('${p.id}', this.checked)" ${paid ? 'checked' : ''}>
+          Pagó $50.000
+        </label>
         <div style="text-align:center;">
           <div style="font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--gold);">${pts}</div>
           <div style="font-size:0.6rem;color:var(--muted);letter-spacing:2px;">PTS</div>
@@ -1924,6 +1954,34 @@ function renderPlayersList() {
       </div>
     </div>`;
   }).join('');
+}
+
+function updateGameLockUI() {
+  const status = document.getElementById('game-lock-status');
+  const button = document.getElementById('game-lock-button');
+  const closed = !!state.gameClosed;
+  if (status) status.textContent = `Estado: ${closed ? 'cerrado' : 'abierto'}`;
+  if (button) {
+    button.textContent = closed ? 'Reabrir juego' : 'Cerrar juego';
+    button.classList.toggle('btn-danger', !closed);
+    button.classList.toggle('btn-success', closed);
+  }
+}
+
+async function toggleGameClosed() {
+  const closed = !state.gameClosed;
+  const action = closed ? 'cerrar' : 'abrir';
+  if (!confirm(`¿Deseas ${action} el juego?`)) return;
+  state.gameClosed = closed;
+  saveState();
+  if (firebaseEnabled) {
+    try {
+      await adminDb.collection(REALS_COLLECTION).doc(REALS_DOC_ID).set({ gameClosed: closed }, { merge: true });
+    } catch (e) {
+      console.warn('No fue posible guardar el estado de juego cerrado en Firestore:', e);
+    }
+  }
+  updateGameLockUI();
 }
 
 // ================================================================

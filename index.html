@@ -48,8 +48,9 @@
 
   <!-- Initialize wizard on page load -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       initFirebase();
+      WZ.gameClosed = await loadGameClosedState();
       render();
     });
   </script>

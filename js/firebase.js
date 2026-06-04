@@ -43,6 +43,17 @@ async function dbLoadPlayer(name) {
   }
 }
 
+async function dbLoadGameState() {
+  if (!initFirebase()) return null;
+  try {
+    const doc = await db.collection(REALS_COLLECTION).doc(REALS_DOC_ID).get();
+    return doc.exists ? doc.data() : null;
+  } catch (e) {
+    console.error('Error cargando estado global del juego:', e);
+    return null;
+  }
+}
+
 async function dbSavePlayer() {
   if (!initFirebase()) {
     firestoreStatus = 'No se puede guardar sin Firestore';

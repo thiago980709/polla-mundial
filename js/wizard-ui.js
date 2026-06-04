@@ -9,11 +9,26 @@ function render() {
   hp.innerHTML = WZ.name ? `Jugador: <strong>${escHtml(WZ.name)}</strong>` : '';
   if (fs) fs.textContent = firestoreStatus;
 
+  if (WZ.gameClosed) { renderClosed(app); return; }
   if (stepIdx === -1) { renderWelcome(app); return; }
   if (stepIdx <= 11)  { renderGroup(app, stepIdx); return; }
   if (stepIdx <= 17)  { renderKO(app, stepIdx-12); return; }
   if (stepIdx === 18) { renderChamp(app); return; }
   renderDone(app);
+}
+
+function renderClosed(app) {
+  app.innerHTML = `
+  <div class="welcome-card">
+    <div class="welcome-hero">
+      <div class="trophy">🚫</div>
+      <h2>Juego cerrado</h2>
+      <p>El juego ya se cerró y no se puede ingresar.</p>
+    </div>
+    <div class="welcome-body">
+      <button class="btn btn-danger" onclick="window.location.reload()">Actualizar estado</button>
+    </div>
+  </div>`;
 }
 
 function renderWelcome(app) {
@@ -51,6 +66,8 @@ async function startWizard() {
   if (!name) { alert('Por favor ingresa tu nombre'); return; }
   WZ.name = name;
   WZ.pid = playerDocId(name);
+  const closed = await loadGameClosedState();
+  if (closed) { alert('El juego ya se cerró'); return; }
   const appState = loadAppState();
   const localState = appState?.data?.[WZ.pid] || {};
   initFirebase();
