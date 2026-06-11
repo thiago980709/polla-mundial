@@ -1793,7 +1793,9 @@ async function loadFirestoreRealResults() {
         ko: data.ko || {},
         champion: data.champion || '',
       };
-      state.gameClosed = data.gameClosed || state.gameClosed || false;
+      if (typeof data.gameClosed === 'boolean') {
+        state.gameClosed = data.gameClosed;
+      }
     } else {
       state.real = { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' };
     }
@@ -1811,6 +1813,7 @@ async function syncRealToFirestore() {
       thirds: state.real.thirds || {},
       ko: state.real.ko || {},
       champion: state.real.champion || '',
+      gameClosed: !!state.gameClosed,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
   } catch (e) {
@@ -2426,11 +2429,15 @@ function renderThirds() {
 
   if (pid) {
     const pts = calcThirdsPoints(pid);
-    note.textContent = pts > 0
-      ? `✅ ${pts} punto${pts!==1?'s':''} acertando terceros clasificados`
-      : hasAnyPred
-        ? 'Ningún tercero acertado aún · Los mejores 8 terceros de cada grupo clasifican automáticamente'
-        : 'Introduce marcadores en los grupos para calcular los terceros automáticamente';
+    if (!areAllRealGroupsComplete()) {
+      note.textContent = 'Los puntos de terceros se activan cuando se ingresen todos los marcadores reales de grupos.';
+    } else {
+      note.textContent = pts > 0
+        ? `✅ ${pts} punto${pts!==1?'s':''} acertando terceros clasificados`
+        : hasAnyPred
+          ? 'Ningún tercero acertado aún · Los mejores 8 terceros de cada grupo clasifican automáticamente'
+          : 'Introduce marcadores en los grupos para calcular los terceros automáticamente';
+    }
   } else {
     note.textContent = 'Los 8 mejores terceros clasifican automáticamente según pts · DG · GF';
   }
@@ -2692,6 +2699,21 @@ function calcKoMatchPoints(pdata, real, rkey) {
   return predOutcome === realOutcome ? 2 : 0;
 }
 
+function isGroupRealComplete(gid) {
+  const teams = GROUPS_DEF.find(g => g.id === gid).teams;
+  const matches = buildMatches(teams);
+  return matches.every((_, mi) => {
+    const rkey = `${gid}_${mi}`;
+    const h = state.real.groups?.[rkey+'_h'];
+    const a = state.real.groups?.[rkey+'_a'];
+    return h !== undefined && h !== '' && a !== undefined && a !== '';
+  });
+}
+
+function areAllRealGroupsComplete() {
+  return GROUPS_DEF.every(g => isGroupRealComplete(g.id));
+}
+
 function calcGroupMatchPoints(gid, pid) {
   if (!pid) return 0;
   const pdata = getData(pid);
@@ -2702,14 +2724,15 @@ function calcGroupMatchPoints(gid, pid) {
     return sum + calcMatchPts(
       pdata.groups[rkey+'_h'] ?? '',
       pdata.groups[rkey+'_a'] ?? '',
-      state.real.groups[rkey+'_h'] ?? '',
-      state.real.groups[rkey+'_a'] ?? ''
+      state.real.groups?.[rkey+'_h'] ?? '',
+      state.real.groups?.[rkey+'_a'] ?? ''
     );
   }, 0);
 }
 
 function calcClassifPoints(gid, pid) {
   if (!pid) return 0;
+  if (!areAllRealGroupsComplete()) return 0;
   const pdata = getData(pid);
   const p1 = pdata.classif[gid+'_1'] || '';
   const p2 = pdata.classif[gid+'_2'] || '';
@@ -2723,6 +2746,7 @@ function calcClassifPoints(gid, pid) {
 
 function calcThirdsPoints(pid) {
   if (!pid) return 0;
+  if (!areAllRealGroupsComplete()) return 0;
   // Always recalculate from live standings, don't rely on stale stored values
   const predSet = new Set(calcBest8Thirds('pred', pid).map(t => t.team));
   const realSet = new Set(calcBest8Thirds('real', null).map(t => t.team));
@@ -2794,10 +2818,17 @@ function setPred(pid, section, key, value) {
 
 function setReal(section, key, value) {
   if (section === 'champion') {
-    state.real.champion = value;
+    state.real.champion = value || '';
   } else {
     if (!state.real[section]) state.real[section] = {};
-    state.real[section][key] = value;
+    if (value === null || value === undefined || value === '') {
+      delete state.real[section][key];
+      if (!Object.keys(state.real[section]).length) {
+        delete state.real[section];
+      }
+    } else {
+      state.real[section][key] = value;
+    }
   }
   saveState();
   updateGlobalScores();
