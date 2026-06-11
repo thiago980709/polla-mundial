@@ -63,9 +63,6 @@ function saveWizardProgressLocal() {
   };
   appState.groupPlayerView = pid;
   appState.koPlayerView = pid;
-  if (typeof WZ.gameClosed === 'boolean') {
-    appState.gameClosed = WZ.gameClosed;
-  }
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
 }
 
@@ -76,8 +73,6 @@ async function loadGameClosedState() {
     const fbData = await dbLoadGameState();
     if (fbData && typeof fbData.gameClosed === 'boolean') {
       closed = fbData.gameClosed;
-      appState.gameClosed = closed;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
     }
   }
   return closed;
@@ -141,10 +136,6 @@ async function saveToApp() {
   };
   appState.groupPlayerView = player.id;
   appState.koPlayerView = player.id;
-  if (typeof WZ.gameClosed === 'boolean') {
-    appState.gameClosed = WZ.gameClosed;
-  }
-
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch(e) {}
   await dbSavePlayer();
 }

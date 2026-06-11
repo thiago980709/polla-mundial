@@ -1661,7 +1661,6 @@ function loadState() {
     currentPlayer: null,
     groupPlayerView: null,
     koPlayerView: null,
-    gameClosed: false,
     data: {}, // data[playerId] = { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'', locked:false }
     real: { groups:{}, classif:{}, thirds:{}, ko:{}, champion:'' }
   };
@@ -1673,7 +1672,7 @@ function loadState() {
       baseState.currentPlayer = parsed.currentPlayer || null;
       baseState.groupPlayerView = parsed.groupPlayerView || null;
       baseState.koPlayerView = parsed.koPlayerView || null;
-      baseState.gameClosed = parsed.gameClosed || false;
+      // Do not load gameClosed from localStorage — gameClosed is authoritative in Firestore
       baseState.data = parsed.data || {};
     }
   } catch(e) {}
@@ -1691,7 +1690,6 @@ function saveStateWithSync(sync = true) {
       currentPlayer: state.currentPlayer,
       groupPlayerView: state.groupPlayerView,
       koPlayerView: state.koPlayerView,
-      gameClosed: state.gameClosed,
       data: state.data,
     };
     localStorage.setItem('polla_mundial_2026', JSON.stringify(stateToSave));
@@ -1748,7 +1746,7 @@ async function loadFirestorePlayers() {
         locked: data.locked || false,
       };
     });
-    saveStateWithSync(false);
+    // Do not persist real results to localStorage when loading from Firestore
   } catch (e) {
     console.warn('Firestore load failed:', e);
   }
@@ -1805,7 +1803,6 @@ async function loadFirestoreRealResults() {
   } catch (e) {
     console.warn('Firestore real results load failed:', e);
   }
-  saveStateWithSync(false);
 }
 
 async function syncRealToFirestore() {
@@ -1980,7 +1977,6 @@ async function toggleGameClosed() {
   const action = closed ? 'cerrar' : 'abrir';
   if (!confirm(`¿Deseas ${action} el juego?`)) return;
   state.gameClosed = closed;
-  saveStateWithSync(false);
   if (firebaseEnabled) {
     try {
       await adminDb.collection(REALS_COLLECTION).doc(REALS_DOC_ID).set({ gameClosed: closed }, { merge: true });
@@ -2834,7 +2830,6 @@ function setReal(section, key, value) {
       state.real[section][key] = value;
     }
   }
-  saveStateWithSync(false);
   if (firebaseEnabled) {
     syncRealToFirestore();
   }
