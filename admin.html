@@ -1681,6 +1681,10 @@ function loadState() {
 }
 
 function saveState() {
+  saveStateWithSync(true);
+}
+
+function saveStateWithSync(sync = true) {
   try {
     const stateToSave = {
       players: state.players,
@@ -1692,9 +1696,8 @@ function saveState() {
     };
     localStorage.setItem('polla_mundial_2026', JSON.stringify(stateToSave));
   } catch(e) {}
-  if (firebaseEnabled) {
+  if (sync && firebaseEnabled) {
     syncStateToFirestore();
-    syncRealToFirestore();
   }
 }
 
@@ -1745,7 +1748,7 @@ async function loadFirestorePlayers() {
         locked: data.locked || false,
       };
     });
-    saveState();
+    saveStateWithSync(false);
   } catch (e) {
     console.warn('Firestore load failed:', e);
   }
@@ -1802,7 +1805,7 @@ async function loadFirestoreRealResults() {
   } catch (e) {
     console.warn('Firestore real results load failed:', e);
   }
-  saveState();
+  saveStateWithSync(false);
 }
 
 async function syncRealToFirestore() {
@@ -1977,7 +1980,7 @@ async function toggleGameClosed() {
   const action = closed ? 'cerrar' : 'abrir';
   if (!confirm(`¿Deseas ${action} el juego?`)) return;
   state.gameClosed = closed;
-  saveState();
+  saveStateWithSync(false);
   if (firebaseEnabled) {
     try {
       await adminDb.collection(REALS_COLLECTION).doc(REALS_DOC_ID).set({ gameClosed: closed }, { merge: true });
@@ -2831,7 +2834,10 @@ function setReal(section, key, value) {
       state.real[section][key] = value;
     }
   }
-  saveState();
+  saveStateWithSync(false);
+  if (firebaseEnabled) {
+    syncRealToFirestore();
+  }
   updateGlobalScores();
   renderPlayerTabs();
   const thirdsNote = document.getElementById('thirds-pts-note');
