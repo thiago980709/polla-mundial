@@ -1572,9 +1572,7 @@ function getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data) {
 }
 
 function getBestThirdCandidates(groups, sourceType, pid, usedTeams = new Set()) {
-  const candidates = [];
-
-  // Primero, si hay terceros reales manuales seleccionados, usarlos como opciones
+  // Si hay terceros reales manuales seleccionados, usar esos valores primero.
   if (sourceType === 'real' && state.real.thirds && Object.keys(state.real.thirds).length > 0) {
     const manualThirds = [];
     for (let i = 0; i < 8; i++) {
@@ -1587,7 +1585,6 @@ function getBestThirdCandidates(groups, sourceType, pid, usedTeams = new Set()) 
         if (groupId) manualThirds.push({ team: thirdTeam, group: groupId });
       }
     }
-
     if (manualThirds.length > 0) {
       const manualCandidates = groups
         .map(g => manualThirds.find(t => t.group === g))
@@ -1598,26 +1595,13 @@ function getBestThirdCandidates(groups, sourceType, pid, usedTeams = new Set()) 
     }
   }
 
-  // Si no hay terceros manuales, mostrar los equipos de los grupos implicados.
-  // Esto permite que el admin elija manualmente entre los tres equipos de esos grupos.
-  groups.forEach(groupId => {
-    const group = GROUPS_DEF.find(g => g.id === groupId);
-    if (!group) return;
-    group.teams.forEach(team => {
-      if (!usedTeams.has(team) && !candidates.includes(team)) candidates.push(team);
-    });
-  });
-
-  if (candidates.length > 0) return candidates;
-
-  // Fallback: usar los terceros calculados automáticamente si no hay opción de grupos
   const thirds = calcBest8Thirds(sourceType, pid);
   const qualified = new Map(thirds.map(t => [t.group, t.team]));
-  const fallback = groups
+  const candidates = groups
     .map(g => qualified.get(g))
     .filter(Boolean)
     .filter(team => !usedTeams.has(team));
-  if (fallback.length > 0) return Array.from(new Set(fallback));
+  if (candidates.length > 0) return Array.from(new Set(candidates));
 
   return groups
     .map(g => {
@@ -1674,9 +1658,12 @@ function resolveKoToken(phaseId, mi, side, sourceType, pid, data) {
 
 function getKoTeamConfig(phaseId, mi, side, sourceType, pid, data, currentValue) {
   const resolved = resolveKoToken(phaseId, mi, side, sourceType, pid, data);
-  const value = resolved.value || currentValue || '';
-  const options = resolved.options.length ? resolved.options : (currentValue ? [currentValue] : []);
-  return { value, options, disabled: resolved.fixed && !!resolved.value };
+  const value = (currentValue && String(currentValue).trim()) ? currentValue : resolved.value || '';
+  const options = resolved.options.length ? resolved.options.slice() : (currentValue ? [currentValue] : []);
+  if (currentValue && options.indexOf(currentValue) === -1) {
+    options.unshift(currentValue);
+  }
+  return { value, options, disabled: resolved.fixed && !!resolved.value && !currentValue };
 }
 
 // ================================================================
@@ -1874,7 +1861,7 @@ async function syncRealToFirestore() {
       champion: state.real.champion || '',
       gameClosed: !!state.gameClosed,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
+    });
   } catch (e) {
     console.warn('Firestore real results sync failed:', e);
   }
@@ -2605,10 +2592,8 @@ function renderKoMatch(phaseId, mi, pid) {
     const ppA = pko[rkey+'_pa'] ?? '';
     const predConfigHome = getKoTeamConfig(phaseId, mi, 'home', 'pred', pid, pko, pht);
     const predConfigAway = getKoTeamConfig(phaseId, mi, 'away', 'pred', pid, pko, pat);
-    const resolvedHomePred = predConfigHome.value || pht;
-    const resolvedAwayPred = predConfigAway.value || pat;
-    if (resolvedHomePred && !pko[rkey+'_ht']) pko[rkey+'_ht'] = resolvedHomePred;
-    if (resolvedAwayPred && !pko[rkey+'_at']) pko[rkey+'_at'] = resolvedAwayPred;
+    const resolvedHomePred = pht || '';
+    const resolvedAwayPred = pat || '';
     const koPts = calcKoMatchPoints(pko, real, rkey);
     if (koPts === 3) {
       badge = `<span class="match-result-badge badge-exact">+3 Exacto</span>`;
@@ -2641,10 +2626,8 @@ function renderKoMatch(phaseId, mi, pid) {
 
   const realConfigHome = getKoTeamConfig(phaseId, mi, 'home', 'real', null, real, rht);
   const realConfigAway = getKoTeamConfig(phaseId, mi, 'away', 'real', null, real, rat);
-  const resolvedHomeReal = realConfigHome.value || rht;
-  const resolvedAwayReal = realConfigAway.value || rat;
-  if (!real[rkey+'_ht'] && resolvedHomeReal) real[rkey+'_ht'] = resolvedHomeReal;
-  if (!real[rkey+'_at'] && resolvedAwayReal) real[rkey+'_at'] = resolvedAwayReal;
+  const resolvedHomeReal = rht || '';
+  const resolvedAwayReal = rat || '';
   const showPenaltyReal = rh !== '' && ra !== '' && rh === ra;
 
   return `<div class="ko-match">
