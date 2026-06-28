@@ -1844,6 +1844,7 @@ async function loadFirestoreRealResults() {
         ko: data.ko || {},
         champion: data.champion || '',
       };
+      if (!state.real.thirds) state.real.thirds = {};
       if (typeof data.gameClosed === 'boolean') {
         state.gameClosed = data.gameClosed;
       }
@@ -2406,10 +2407,17 @@ function calcBest8Thirds(sourceType, pid) {
 
 // Auto-sync thirds into state so scoring works
 function syncThirds() {
-  // Sync real thirds from real results
+  // Sync real thirds from real results, but preserve any manual selections already made
   const realThirds = calcBest8Thirds('real', null);
-  state.real.thirds = {};
-  realThirds.forEach((t, i) => { state.real.thirds['t'+i] = t.team; });
+  if (!state.real.thirds) state.real.thirds = {};
+  const existingRealThirds = { ...state.real.thirds };
+  state.real.thirds = { ...existingRealThirds };
+  realThirds.forEach((t, i) => {
+    const key = 't' + i;
+    if (!state.real.thirds[key] && t && t.team) {
+      state.real.thirds[key] = t.team;
+    }
+  });
 
   // Sync pred thirds for each player
   state.players.forEach(p => {
@@ -2455,9 +2463,10 @@ function renderThirds() {
 
   // Get all possible third candidates for selection
   const allThirdCandidates = realThirds.map(t => t.team).slice(0, 8);
+  const manualRealThirds = state.real.thirds || {};
 
   grid.innerHTML = `<div style="grid-column:1/-1;background:rgba(6,167,125,0.08);border:1px solid rgba(6,167,125,0.3);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:0.78rem;color:var(--muted);line-height:1.5;">
-    <strong style="color:var(--success);">🟢 Selecciona los 8 terceros clasificados:</strong> El sistema calculó automáticamente los mejores terceros. Selecciona cada uno en los dropdowns. Una vez confirmados, los usaremos en los enfrentamientos de eliminatorias.
+    <strong style="color:var(--success);">🟢 Selecciona los 8 terceros clasificados:</strong> Puedes cambiar cualquier opción, dejarla vacía o volver a elegir otra. Estos valores se guardan y también se cargarán desde Firebase.
   </div>` + slots.map(s => {
     const predPill = s.pred
       ? `<div class="classif-auto-pill pred-pill" title="Grupo ${s.pred.group} · ${s.pred.pts}pts · DG${s.pred.gd > 0 ? '+' : ''}${s.pred.gd}">
@@ -2466,9 +2475,9 @@ function renderThirds() {
          </div>`
       : `<div class="classif-auto-pill pred-pill" style="opacity:0.35;">—</div>`;
 
-    // Real: Allow manual selection as dropdown
-    const realValue = s.real ? s.real.team : '';
-    const realOptions = `<option value="">-- Selecciona tercero --</option>` + 
+    // Real: Allow manual selection as dropdown and preserve cleared values
+    const realValue = manualRealThirds['t' + s.idx] || '';
+    const realOptions = `<option value="">-- Sin seleccionar --</option>` + 
       allThirdCandidates.map(t => 
         `<option value="${t}"${t === realValue ? ' selected' : ''}>${t}</option>`
       ).join('');
@@ -2850,12 +2859,12 @@ function calcPlayerTotal(pid) {
 // SET DATA
 // ================================================================
 function setRealThird(thirdIndex, teamName) {
-  // Guarda el tercero seleccionado manualmente en el índice especificado
   if (!state.real.thirds) state.real.thirds = {};
-  if (teamName) {
-    state.real.thirds['t'+thirdIndex] = teamName;
+  const key = 't' + thirdIndex;
+  if (teamName && String(teamName).trim()) {
+    state.real.thirds[key] = String(teamName).trim();
   } else {
-    delete state.real.thirds['t'+thirdIndex];
+    delete state.real.thirds[key];
   }
   if (firebaseEnabled) {
     syncRealToFirestore();
@@ -2863,7 +2872,6 @@ function setRealThird(thirdIndex, teamName) {
   updateGlobalScores();
   renderPlayerTabs();
   renderThirds();
-  // Si estamos visualizando eliminatorias, refrescar también
   if (document.getElementById('page-llaves').classList.contains('active')) renderKnockout();
 }
 
