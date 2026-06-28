@@ -1573,6 +1573,37 @@ function getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data) {
 
 function getBestThirdCandidates(groups, sourceType, pid, usedTeams = new Set()) {
   const thirds = calcBest8Thirds(sourceType, pid);
+  
+  // Si estamos en resultado real y hay terceros manuales seleccionados, usarlos
+  if (sourceType === 'real' && state.real.thirds && Object.keys(state.real.thirds).length > 0) {
+    // Convertir terceros manuales a un array de equipos con su grupo asociado
+    const manualThirds = [];
+    for (let i = 0; i < 8; i++) {
+      const thirdTeam = state.real.thirds['t'+i];
+      if (thirdTeam) {
+        // Buscar a qué grupo pertenece este equipo
+        const groupId = GROUPS_DEF.find(g => {
+          const standings = calcGroupStandings(g.id, 'real', null);
+          return standings[2] && standings[2].name === thirdTeam;
+        })?.id;
+        if (groupId) {
+          manualThirds.push({ team: thirdTeam, group: groupId });
+        }
+      }
+    }
+    
+    if (manualThirds.length > 0) {
+      // Usar solo los terceros manuales que coincidan con los grupos solicitados
+      const candidates = groups
+        .map(g => manualThirds.find(t => t.group === g))
+        .filter(Boolean)
+        .map(t => t.team)
+        .filter(team => !usedTeams.has(team));
+      if (candidates.length > 0) return Array.from(new Set(candidates));
+    }
+  }
+  
+  // Si no hay manuales o no coinciden los grupos, usar los calculados automáticamente
   const qualified = new Map(thirds.map(t => [t.group, t.team]));
   const candidates = groups
     .map(g => qualified.get(g))
@@ -1597,6 +1628,25 @@ function resolveKoToken(phaseId, mi, side, sourceType, pid, data) {
     return { value: team || '', options, fixed: !!team };
   }
   if (token.type === 'third') {
+    // En resultado real (r32 y más adelante), permitir seleccionar tercero manualmente
+    if (sourceType === 'real' && phaseId === 'r32') {
+      const used = getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data);
+      const options = getBestThirdCandidates(token.groups, sourceType, pid, used);
+      const currentValue = data && data[phaseId+'_'+mi+'_'+(side==='home'?'ht':'at')] ? String(data[phaseId+'_'+mi+'_'+(side==='home'?'ht':'at')]).trim() : '';
+      const value = currentValue || (options.length > 0 ? options[0] : '');
+      // NO es fixed - permitir al admin seleccionar el tercero
+      return { value: value, options: options, fixed: false };
+    }
+    // En predicciones, mantener automático (fixed)
+    if (sourceType === 'pred') {
+      const used = getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data);
+      const options = getBestThirdCandidates(token.groups, sourceType, pid, used);
+      if (options.length > 0) {
+        return { value: options[0], options, fixed: true };
+      }
+      return { value: '', options: options, fixed: false };
+    }
+    // Para r16 en adelante, mantener automático
     const used = getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data);
     const options = getBestThirdCandidates(token.groups, sourceType, pid, used);
     if (options.length > 0) {
@@ -2395,7 +2445,7 @@ function renderThirds() {
     return;
   }
 
-  // Build unified list of up to 8 slots
+  // Build unified list of up to 8 slots with selection UI for real results
   const slots = Array.from({length: Math.max(predThirds.length, realThirds.length, 1)}, (_, i) => {
     const p = predThirds[i];
     const r = realThirds[i];
@@ -2403,7 +2453,12 @@ function renderThirds() {
     return { idx: i, pred: p, real: r, hit: isHit };
   });
 
-  grid.innerHTML = slots.map(s => {
+  // Get all possible third candidates for selection
+  const allThirdCandidates = realThirds.map(t => t.team).slice(0, 8);
+
+  grid.innerHTML = `<div style="grid-column:1/-1;background:rgba(6,167,125,0.08);border:1px solid rgba(6,167,125,0.3);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:0.78rem;color:var(--muted);line-height:1.5;">
+    <strong style="color:var(--success);">🟢 Selecciona los 8 terceros clasificados:</strong> El sistema calculó automáticamente los mejores terceros. Selecciona cada uno en los dropdowns. Una vez confirmados, los usaremos en los enfrentamientos de eliminatorias.
+  </div>` + slots.map(s => {
     const predPill = s.pred
       ? `<div class="classif-auto-pill pred-pill" title="Grupo ${s.pred.group} · ${s.pred.pts}pts · DG${s.pred.gd > 0 ? '+' : ''}${s.pred.gd}">
           ⚡ ${escHtml(s.pred.team)}
@@ -2411,19 +2466,21 @@ function renderThirds() {
          </div>`
       : `<div class="classif-auto-pill pred-pill" style="opacity:0.35;">—</div>`;
 
-    const realPill = s.real
-      ? `<div class="classif-auto-pill real-pill" title="Grupo ${s.real.group} · ${s.real.pts}pts · DG${s.real.gd > 0 ? '+' : ''}${s.real.gd}">
-          ⚡ ${escHtml(s.real.team)}
-          <span style="font-size:0.58rem;opacity:0.7;margin-left:4px;">(Gpo ${s.real.group})</span>
-          ${s.hit && pid ? '<span class="match-result-badge badge-exact" style="margin-left:6px;">+1</span>' : ''}
-         </div>`
-      : `<div class="classif-auto-pill real-pill" style="opacity:0.35;">—</div>`;
+    // Real: Allow manual selection as dropdown
+    const realValue = s.real ? s.real.team : '';
+    const realOptions = `<option value="">-- Selecciona tercero --</option>` + 
+      allThirdCandidates.map(t => 
+        `<option value="${t}"${t === realValue ? ' selected' : ''}>${t}</option>`
+      ).join('');
 
     return `<div class="third-item" style="flex-direction:column;align-items:stretch;gap:5px;padding:8px;background:var(--blue-card);border-radius:6px;border:1px solid var(--border);">
       <div style="font-size:0.6rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;">3° Clasificado ${s.idx+1}</div>
       ${pid ? `<div style="font-size:0.6rem;color:#3B82F6;letter-spacing:1px;margin-bottom:2px;">🔵 TU PREDICCIÓN</div>${predPill}` : ''}
-      <div style="font-size:0.6rem;color:var(--success);letter-spacing:1px;margin-top:${pid?'4':'0'}px;margin-bottom:2px;">🟢 RESULTADO REAL</div>
-      ${realPill}
+      <div style="font-size:0.6rem;color:var(--success);letter-spacing:1px;margin-top:${pid?'4':'0'}px;margin-bottom:2px;">🟢 RESULTADO REAL (Selecciona)</div>
+      <select style="flex:1;background:var(--blue-dark);border:1px solid rgba(6,167,125,0.4);border-radius:5px;color:var(--text);font-size:0.85rem;padding:6px 8px;cursor:pointer;font-weight:600;" onchange="setRealThird(${s.idx}, this.value)">
+        ${realOptions}
+      </select>
+      ${s.hit && pid ? '<div style="text-align:center;margin-top:4px;"><span class="match-result-badge badge-exact">+1 Acertado</span></div>' : ''}
     </div>`;
   }).join('');
 
@@ -2439,7 +2496,7 @@ function renderThirds() {
           : 'Introduce marcadores en los grupos para calcular los terceros automáticamente';
     }
   } else {
-    note.textContent = 'Los 8 mejores terceros clasifican automáticamente según pts · DG · GF';
+    note.textContent = '👆 Selecciona aquí los 8 terceros oficiales que clasificaron. Luego podrás elegir cuál enfrenta a cada rival en eliminatorias.';
   }
 }
 
@@ -2792,6 +2849,24 @@ function calcPlayerTotal(pid) {
 // ================================================================
 // SET DATA
 // ================================================================
+function setRealThird(thirdIndex, teamName) {
+  // Guarda el tercero seleccionado manualmente en el índice especificado
+  if (!state.real.thirds) state.real.thirds = {};
+  if (teamName) {
+    state.real.thirds['t'+thirdIndex] = teamName;
+  } else {
+    delete state.real.thirds['t'+thirdIndex];
+  }
+  if (firebaseEnabled) {
+    syncRealToFirestore();
+  }
+  updateGlobalScores();
+  renderPlayerTabs();
+  renderThirds();
+  // Si estamos visualizando eliminatorias, refrescar también
+  if (document.getElementById('page-llaves').classList.contains('active')) renderKnockout();
+}
+
 function setPred(pid, section, key, value) {
   if (isPlayerLocked(pid) && section !== 'real') return;
   const pdata = getData(pid);
