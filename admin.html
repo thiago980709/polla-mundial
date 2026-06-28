@@ -1572,44 +1572,53 @@ function getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data) {
 }
 
 function getBestThirdCandidates(groups, sourceType, pid, usedTeams = new Set()) {
-  const thirds = calcBest8Thirds(sourceType, pid);
-  
-  // Si estamos en resultado real y hay terceros manuales seleccionados, usarlos
+  const candidates = [];
+
+  // Primero, si hay terceros reales manuales seleccionados, usarlos como opciones
   if (sourceType === 'real' && state.real.thirds && Object.keys(state.real.thirds).length > 0) {
-    // Convertir terceros manuales a un array de equipos con su grupo asociado
     const manualThirds = [];
     for (let i = 0; i < 8; i++) {
-      const thirdTeam = state.real.thirds['t'+i];
+      const thirdTeam = state.real.thirds['t' + i];
       if (thirdTeam) {
-        // Buscar a qué grupo pertenece este equipo
         const groupId = GROUPS_DEF.find(g => {
           const standings = calcGroupStandings(g.id, 'real', null);
           return standings[2] && standings[2].name === thirdTeam;
         })?.id;
-        if (groupId) {
-          manualThirds.push({ team: thirdTeam, group: groupId });
-        }
+        if (groupId) manualThirds.push({ team: thirdTeam, group: groupId });
       }
     }
-    
+
     if (manualThirds.length > 0) {
-      // Usar solo los terceros manuales que coincidan con los grupos solicitados
-      const candidates = groups
+      const manualCandidates = groups
         .map(g => manualThirds.find(t => t.group === g))
         .filter(Boolean)
         .map(t => t.team)
         .filter(team => !usedTeams.has(team));
-      if (candidates.length > 0) return Array.from(new Set(candidates));
+      if (manualCandidates.length > 0) return Array.from(new Set(manualCandidates));
     }
   }
-  
-  // Si no hay manuales o no coinciden los grupos, usar los calculados automáticamente
+
+  // Si no hay terceros manuales, mostrar los equipos de los grupos implicados.
+  // Esto permite que el admin elija manualmente entre los tres equipos de esos grupos.
+  groups.forEach(groupId => {
+    const group = GROUPS_DEF.find(g => g.id === groupId);
+    if (!group) return;
+    group.teams.forEach(team => {
+      if (!usedTeams.has(team) && !candidates.includes(team)) candidates.push(team);
+    });
+  });
+
+  if (candidates.length > 0) return candidates;
+
+  // Fallback: usar los terceros calculados automáticamente si no hay opción de grupos
+  const thirds = calcBest8Thirds(sourceType, pid);
   const qualified = new Map(thirds.map(t => [t.group, t.team]));
-  const candidates = groups
+  const fallback = groups
     .map(g => qualified.get(g))
     .filter(Boolean)
     .filter(team => !usedTeams.has(team));
-  if (candidates.length > 0) return Array.from(new Set(candidates));
+  if (fallback.length > 0) return Array.from(new Set(fallback));
+
   return groups
     .map(g => {
       const standings = calcGroupStandings(g, sourceType, pid);
@@ -1628,14 +1637,12 @@ function resolveKoToken(phaseId, mi, side, sourceType, pid, data) {
     return { value: team || '', options, fixed: !!team };
   }
   if (token.type === 'third') {
-    // En resultado real (r32 y más adelante), permitir seleccionar tercero manualmente
     if (sourceType === 'real' && phaseId === 'r32') {
       const used = getUsedThirdTeams(phaseId, mi, side, sourceType, pid, data);
       const options = getBestThirdCandidates(token.groups, sourceType, pid, used);
       const currentValue = data && data[phaseId+'_'+mi+'_'+(side==='home'?'ht':'at')] ? String(data[phaseId+'_'+mi+'_'+(side==='home'?'ht':'at')]).trim() : '';
-      const value = currentValue || (options.length > 0 ? options[0] : '');
-      // NO es fixed - permitir al admin seleccionar el tercero
-      return { value: value, options: options, fixed: false };
+      const value = currentValue || '';
+      return { value, options, fixed: false };
     }
     // En predicciones, mantener automático (fixed)
     if (sourceType === 'pred') {
