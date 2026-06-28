@@ -2689,31 +2689,37 @@ function calcMatchPts(ph, pa, rh, ra) {
   return 0;
 }
 
-function getMatchOutcome(h, a, ph, pa) {
-  const mainResult = getMatchResult(h, a);
-  if (mainResult && mainResult !== 'draw') return mainResult;
+function getKoWinnerTeam(teamHome, teamAway, scoreHome, scoreAway, penaltyHome, penaltyAway) {
+  const mainResult = getMatchResult(scoreHome, scoreAway);
+  if (mainResult && mainResult !== 'draw') {
+    return mainResult === 'home' ? teamHome : teamAway;
+  }
   if (mainResult !== 'draw') return '';
-  if (ph===''||pa===''||ph==null||pa==null) return '';
-  return getMatchResult(ph, pa);
+  if (penaltyHome === '' || penaltyAway === '' || penaltyHome == null || penaltyAway == null) return '';
+  const penaltyResult = getMatchResult(penaltyHome, penaltyAway);
+  if (!penaltyResult || penaltyResult === 'draw') return '';
+  return penaltyResult === 'home' ? teamHome : teamAway;
 }
 
 function isKoScoreExact(pHome, pAway, rHome, rAway, ph, pa, rh, ra, pph, ppa, rph, rpa) {
-  const homeExact = String(ph) === String(rh) && String(pa) === String(ra);
-  const swappedExact = String(ph) === String(ra) && String(pa) === String(rh);
-  if (homeExact && pHome === rHome && pAway === rAway) {
-    if (rh === ra) return String(pph) === String(rph) && String(ppa) === String(rpa);
-    return true;
-  }
-  if (swappedExact && pHome === rAway && pAway === rHome) {
-    if (rh === ra) return String(pph) === String(rpa) && String(ppa) === String(rph);
-    return true;
-  }
-  return false;
+  const sameTeamSet = [pHome, pAway].every(t => [rHome, rAway].includes(t)) && [rHome, rAway].every(t => [pHome, pAway].includes(t));
+  if (!sameTeamSet) return false;
+
+  const mainScoreExact = String(ph) === String(rh) && String(pa) === String(ra);
+  const swappedMainScoreExact = String(ph) === String(ra) && String(pa) === String(rh);
+  if (!mainScoreExact && !swappedMainScoreExact) return false;
+
+  const mainResult = getMatchResult(rh, ra);
+  if (!mainResult || mainResult !== 'draw') return true;
+
+  const predWinner = getKoWinnerTeam(pHome, pAway, ph, pa, pph, ppa);
+  const realWinner = getKoWinnerTeam(rHome, rAway, rh, ra, rph, rpa);
+  return !!predWinner && !!realWinner && predWinner === realWinner;
 }
 
 // Calcula puntos de eliminatoria comparando equipos y resultado.
-// 0 si no coincide ningún equipo de la llave, 2 si al menos un equipo coincide y el ganador es correcto,
-// 3 solo si ambos equipos coinciden en la llave y el marcador exacto aplica.
+// 3 puntos solo si los dos equipos coinciden y el marcador principal exacto aplica.
+// 2 puntos si el equipo que avanza coincide con el que el jugador predijo.
 function calcKoMatchPoints(pdata, real, rkey) {
   const pht = pdata[rkey+'_ht'] || '';
   const pat = pdata[rkey+'_at'] || '';
@@ -2735,24 +2741,15 @@ function calcKoMatchPoints(pdata, real, rkey) {
   const rHome = String(rht).trim();
   const rAway = String(rat).trim();
 
-  const predTeams = [pHome, pAway];
-  const realTeams = [rHome, rAway];
-  const uniqueMatchCount = new Set(predTeams.filter(t => realTeams.includes(t))).size;
-  if (uniqueMatchCount === 0) return 0;
-
-  const predOutcome = getMatchOutcome(ph, pa, pph, ppa);
-  const realOutcome = getMatchOutcome(rh, ra, rph, rpa);
-  if (!predOutcome || !realOutcome) return 0;
-
-  const sameTeamSet = predTeams.every(t => realTeams.includes(t)) && realTeams.every(t => predTeams.includes(t));
-  if (sameTeamSet) {
-    if (isKoScoreExact(pHome, pAway, rHome, rAway, ph, pa, rh, ra, pph, ppa, rph, rpa)) {
-      return 3;
-    }
-    return predOutcome === realOutcome ? 2 : 0;
+  const sameTeamSet = [pHome, pAway].every(t => [rHome, rAway].includes(t)) && [rHome, rAway].every(t => [pHome, pAway].includes(t));
+  if (sameTeamSet && isKoScoreExact(pHome, pAway, rHome, rAway, ph, pa, rh, ra, pph, ppa, rph, rpa)) {
+    return 3;
   }
 
-  return predOutcome === realOutcome ? 2 : 0;
+  const predWinner = getKoWinnerTeam(pHome, pAway, ph, pa, pph, ppa);
+  const realWinner = getKoWinnerTeam(rHome, rAway, rh, ra, rph, rpa);
+  if (predWinner && realWinner && predWinner === realWinner) return 2;
+  return 0;
 }
 
 function isGroupRealComplete(gid) {
