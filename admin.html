@@ -1472,11 +1472,21 @@ function getPhaseMatchIndex(matchNumber) {
   return phase === 'tp' || phase === 'final' ? 0 : matchNumber - starts[phase];
 }
 
-function getKoMatchWinner(rkey, data) {
+function getKoMatchWinner(rkey, data, sourceType = 'real', pid = null) {
   const h = data[rkey+'_h'];
   const a = data[rkey+'_a'];
-  const ht = data[rkey+'_ht'] || '';
-  const at = data[rkey+'_at'] || '';
+  let ht = data[rkey+'_ht'] || '';
+  let at = data[rkey+'_at'] || '';
+  if ((!ht || !at)) {
+    const [phaseId, miStr] = String(rkey).split('_');
+    const mi = parseInt(miStr, 10);
+    if (phaseId && !Number.isNaN(mi)) {
+      const resolvedHome = resolveKoToken(phaseId, mi, 'home', sourceType, pid, data);
+      const resolvedAway = resolveKoToken(phaseId, mi, 'away', sourceType, pid, data);
+      ht = String(resolvedHome.value || '').trim();
+      at = String(resolvedAway.value || '').trim();
+    }
+  }
   if (h === '' || a === '' || h == null || a == null) return '';
   const hi = parseInt(h, 10);
   const ai = parseInt(a, 10);
@@ -1495,28 +1505,28 @@ function getKoMatchWinner(rkey, data) {
   return '';
 }
 
-function getKoMatchLoser(rkey, data) {
+function getKoMatchLoser(rkey, data, sourceType = 'real', pid = null) {
   const ht = data[rkey+'_ht'] || '';
   const at = data[rkey+'_at'] || '';
-  const winner = getKoMatchWinner(rkey, data);
+  const winner = getKoMatchWinner(rkey, data, sourceType, pid);
   if (!winner || !ht || !at) return '';
   return winner === ht ? at : ht;
 }
 
-function getKoMatchWinnerByNumber(matchNumber, data) {
+function getKoMatchWinnerByNumber(matchNumber, data, sourceType = 'real', pid = null) {
   const phase = getPhaseIdByMatchNumber(matchNumber);
   if (!phase) return '';
   const idx = getPhaseMatchIndex(matchNumber);
   const rkey = `${phase}_${idx}`;
-  return getKoMatchWinner(rkey, data);
+  return getKoMatchWinner(rkey, data, sourceType, pid);
 }
 
-function getKoMatchLoserByNumber(matchNumber, data) {
+function getKoMatchLoserByNumber(matchNumber, data, sourceType = 'real', pid = null) {
   const phase = getPhaseIdByMatchNumber(matchNumber);
   if (!phase) return '';
   const idx = getPhaseMatchIndex(matchNumber);
   const rkey = `${phase}_${idx}`;
-  return getKoMatchLoser(rkey, data);
+  return getKoMatchLoser(rkey, data, sourceType, pid);
 }
 
 function getGroupPlaceName(gid, pos, sourceType, pid) {
@@ -1646,11 +1656,11 @@ function resolveKoToken(phaseId, mi, side, sourceType, pid, data) {
     return { value: '', options: options, fixed: false };
   }
   if (token.type === 'match') {
-    const team = getKoMatchWinnerByNumber(token.match, data);
+    const team = getKoMatchWinnerByNumber(token.match, data, sourceType, pid);
     return { value: team || '', options: team ? [team] : [], fixed: !!team };
   }
   if (token.type === 'loser') {
-    const team = getKoMatchLoserByNumber(token.match, data);
+    const team = getKoMatchLoserByNumber(token.match, data, sourceType, pid);
     return { value: team || '', options: team ? [team] : [], fixed: !!team };
   }
   return { value:'', options: [], fixed:false };
@@ -2594,7 +2604,7 @@ function renderKoMatch(phaseId, mi, pid) {
     const predConfigAway = getKoTeamConfig(phaseId, mi, 'away', 'pred', pid, pko, pat);
     const resolvedHomePred = pht || '';
     const resolvedAwayPred = pat || '';
-    const koPts = calcKoMatchPoints(pko, real, rkey);
+    const koPts = calcKoMatchPoints(pko, real, rkey, pid);
     if (koPts === 3) {
       badge = `<span class="match-result-badge badge-exact">+3 Exacto</span>`;
     } else if (koPts === 2) {
@@ -2717,10 +2727,29 @@ function isKoScoreExact(pHome, pAway, rHome, rAway, ph, pa, rh, ra, pph, ppa, rp
   return !!predWinner && !!realWinner && predWinner === realWinner;
 }
 
+function getResolvedKoTeams(phaseId, mi, sourceType, pid, data, rkey) {
+  const homeKey = `${rkey}_ht`;
+  const awayKey = `${rkey}_at`;
+  const storedHome = data && data[homeKey] ? String(data[homeKey]).trim() : '';
+  const storedAway = data && data[awayKey] ? String(data[awayKey]).trim() : '';
+  if (storedHome || storedAway) {
+    return { home: storedHome, away: storedAway };
+  }
+
+  const resolvedHome = resolveKoToken(phaseId, mi, 'home', sourceType, pid, data);
+  const resolvedAway = resolveKoToken(phaseId, mi, 'away', sourceType, pid, data);
+  return {
+    home: (resolvedHome.value ? String(resolvedHome.value).trim() : ''),
+    away: (resolvedAway.value ? String(resolvedAway.value).trim() : ''),
+  };
+}
+
 // Calcula puntos de eliminatoria comparando equipos y resultado.
 // 3 puntos solo si los dos equipos coinciden y el marcador principal exacto aplica.
 // 2 puntos si el equipo que avanza coincide con el que el jugador predijo.
-function calcKoMatchPoints(pdata, real, rkey) {
+function calcKoMatchPoints(pdata, real, rkey, pid = null) {
+  const [phaseId, miStr] = String(rkey).split('_');
+  const mi = parseInt(miStr, 10);
   const pht = pdata[rkey+'_ht'] || '';
   const pat = pdata[rkey+'_at'] || '';
   const rht = real[rkey+'_ht'] || '';
@@ -2734,12 +2763,14 @@ function calcKoMatchPoints(pdata, real, rkey) {
   const rph = real[rkey+'_ph'] ?? '';
   const rpa = real[rkey+'_pa'] ?? '';
 
-  if (!pht || !pat || !rht || !rat) return 0;
+  const predTeams = getResolvedKoTeams(phaseId, mi, 'pred', pid, pdata, rkey);
+  const realTeams = getResolvedKoTeams(phaseId, mi, 'real', null, real, rkey);
+  const pHome = String(predTeams.home || pht || '').trim();
+  const pAway = String(predTeams.away || pat || '').trim();
+  const rHome = String(realTeams.home || rht || '').trim();
+  const rAway = String(realTeams.away || rat || '').trim();
 
-  const pHome = String(pht).trim();
-  const pAway = String(pat).trim();
-  const rHome = String(rht).trim();
-  const rAway = String(rat).trim();
+  if (!pHome || !pAway || !rHome || !rAway) return 0;
 
   const sameTeamSet = [pHome, pAway].every(t => [rHome, rAway].includes(t)) && [rHome, rAway].every(t => [pHome, pAway].includes(t));
   if (sameTeamSet && isKoScoreExact(pHome, pAway, rHome, rAway, ph, pa, rh, ra, pph, ppa, rph, rpa)) {
@@ -2816,7 +2847,7 @@ function calcKoPoints(pid) {
   KO_PHASES.forEach(phase => {
     for (let mi=0; mi < phase.count/2; mi++) {
       const rkey = `${phase.id}_${mi}`;
-      pts += calcKoMatchPoints(pdata, real, rkey);
+      pts += calcKoMatchPoints(pdata, real, rkey, pid);
     }
   });
   return pts;
